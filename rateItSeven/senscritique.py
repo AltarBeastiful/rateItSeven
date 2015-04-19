@@ -62,9 +62,7 @@ class SensCritique(object):
         :Return: true if login succeeded, false otherwise
         '''
 
-        loginForm = self.getNode('//*[@id="wrap"]/header/div[1]/div/div/div/div')
-        hover = ActionChains(self.driver).move_to_element(loginForm)
-        hover.perform()
+        self.hoverNode('//*[@id="wrap"]/header/div[1]/div/div/div/div')
 
         loginField = self.getNode('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/input[1]')
         passwordField = self.getNode('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/input[2]')
@@ -98,4 +96,15 @@ class SensCritique(object):
             node = None
         finally:
             return node
+
+    def hoverNode(self, xpath):
+        node = self.getNode(xpath)
+
+        if node is None:
+            return False
+
+        hover = ActionChains(self.driver).move_to_element(node)
+        hover.perform()
+
+        return True
 
