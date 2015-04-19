@@ -17,7 +17,7 @@
 #
 
 import logging
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver import PhantomJS
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
@@ -62,17 +62,17 @@ class SensCritique(object):
         :Return: true if login succeeded, false otherwise
         '''
 
-        loginForm = self.driver.find_element_by_xpath('//*[@id="wrap"]/header/div[1]/div/div/div/div')
+        loginForm = self.getNode('//*[@id="wrap"]/header/div[1]/div/div/div/div')
         hover = ActionChains(self.driver).move_to_element(loginForm)
         hover.perform()
 
-        loginField = self.driver.find_element_by_xpath('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/input[1]')
-        passwordField = self.driver.find_element_by_xpath('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/input[2]')
+        loginField = self.getNode('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/input[1]')
+        passwordField = self.getNode('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/input[2]')
 
         loginField.send_keys(self.login)
         passwordField.send_keys(self.password)
 
-        submit = self.driver.find_element_by_xpath('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/fieldset/input')
+        submit = self.getNode('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/fieldset/input')
         submit.click()
 
         try:
@@ -84,9 +84,18 @@ class SensCritique(object):
 
             return True
         except TimeoutException:
-            loginError = self.driver.find_elements_by_xpath('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/fieldset/p')
-            if len(loginError) == 1:
-                logging.error("Couldn't login : " + loginError[0].get_attribute('innerHTML'))
+            loginError = self.getNode('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/fieldset/p')
+
+            if loginError is not None:
+                logging.error("Couldn't login : " + loginError.get_attribute('innerHTML'))
 
             return False
+
+    def getNode(self, xpath):
+        try:
+            node = self.driver.find_element_by_xpath(xpath);
+        except NoSuchElementException:
+            node = None
+        finally:
+            return node
 
