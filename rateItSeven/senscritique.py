@@ -16,6 +16,7 @@
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import logging
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver import PhantomJS
 from selenium.webdriver.common.action_chains import ActionChains
@@ -76,8 +77,16 @@ class SensCritique(object):
 
         try:
             currentUser = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="wrap"]/header/div[1]/div/div/div/a[3]')))
+            currentUserChildNodes = currentUser.find_elements_by_xpath(".//*")
+
+            if len(currentUserChildNodes) == 2:
+                logging.info("Logged in with user " + currentUserChildNodes[1].get_attribute('innerHTML'))
+
             return True
         except TimeoutException:
-            # TODO : test if loginError is present and log the message
+            loginError = self.driver.find_elements_by_xpath('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/fieldset/p')
+            if len(loginError) == 1:
+                logging.error("Couldn't login : " + loginError[0].get_attribute('innerHTML'))
+
             return False
 
