@@ -78,7 +78,8 @@ class SensCritique(object):
             currentUserChildNodes = currentUser.find_elements_by_xpath(".//*")
 
             if len(currentUserChildNodes) == 2:
-                logging.info("Logged in with user " + currentUserChildNodes[1].get_attribute('innerHTML'))
+                self.currentUsername = currentUserChildNodes[1].get_attribute('innerHTML')
+                logging.info("Logged in with user " + self.currentUsername)
 
             return True
         except TimeoutException:
