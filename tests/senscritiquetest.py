@@ -22,6 +22,9 @@ from rateItSeven.senscritique import SensCritique
 
 class TestSensCritique(unittest.TestCase):
 
+    def corretLogin(self):
+        return SensCritique("legalizme@gmail.com", "12345")
+
     def test_shouldChangeMyUserAgent(self):
         expectedUserAgent = "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/5.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C)"
         sc = SensCritique("", "", expectedUserAgent, "http://gs.statcounter.com/detect")
@@ -34,8 +37,19 @@ class TestSensCritique(unittest.TestCase):
         self.assertFalse(sc.sign_in())
 
     def test_shouldSuccessLogin(self):
-        sc = SensCritique("legalizme@gmail.com", "12345")
+        sc = self.corretLogin()
         self.assertTrue(sc.sign_in())
+
+    def test_shouldRetrieveListFromId(self):
+        sc = self.corretLogin()
+        sc.sign_in()
+
+        listId = "857267"
+        listTitle = "Une liste"
+        myList = sc.retrieveListById(listId)
+
+        self.assertEqual(listId, myList.id())
+        self.assertEqual(listTitle, myList.title())
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

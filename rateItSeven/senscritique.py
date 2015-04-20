@@ -25,12 +25,17 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+from rateItSeven import sclist
+
 
 LINUX_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36"
 SC_HOME_PAGE = 'http://senscritique.com'
 
 
 class SensCritique(object):
+
+    # Pages URL
+    PAGE_LISTS = 'http://www.senscritique.com/{}/listes'
 
     '''
     Interact with SensCritique website
@@ -89,6 +94,29 @@ class SensCritique(object):
                 logging.error("Couldn't login : " + loginError.get_attribute('innerHTML'))
 
             return False
+
+    def retrieveListById(self, id):
+
+        # Go to Lists page
+        self.driver.get(self.PAGE_LISTS.format(self.currentUsername))
+
+        # wait for page to load
+        self.waitForNode('//*[@id="wrap"]/div[4]/div[2]/div/button', EC.element_to_be_clickable)
+
+        for listNode in self.getNodes('//*[@id="wrap"]/div[4]/div[3]/ul/li'):
+            children = listNode.find_elements_by_xpath('*')
+
+            listUrl = children[1].get_attribute('href')
+            if id in listUrl:
+                result = sclist.SCList(id)
+
+                result.setTitle(children[1].get_attribute('title'))
+                result.setDescription(children[2].get_attribute('innerHTML'))
+                result.setType(None) #TODO: parse the type
+
+                return result
+
+        return None
 
     def getNode(self, xpath):
         try:
