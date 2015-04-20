@@ -92,14 +92,17 @@ class SensCritique(object):
 
     def getNode(self, xpath):
         try:
-            node = self.driver.find_element_by_xpath(xpath);
-        except NoSuchElementException:
+            node = self.waitForNode(xpath, EC.presence_of_element_located, 2)
+        except (NoSuchElementException, TimeoutException):
             node = None
         finally:
             return node
 
+    def getNodes(self, xpath):
+        return self.driver.find_elements_by_xpath(xpath)
+
     def hoverNode(self, xpath):
-        node = self.getNode(xpath)
+        node = self.waitForNode(xpath, EC.visibility_of_element_located)
 
         if node is None:
             return False
@@ -108,4 +111,7 @@ class SensCritique(object):
         hover.perform()
 
         return True
+
+    def waitForNode(self, xpath, condition, timeout = 10):
+        return WebDriverWait(self.driver, timeout).until(condition((By.XPATH, xpath)))
 
