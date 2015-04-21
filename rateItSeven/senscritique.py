@@ -26,6 +26,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from rateItSeven import sclist
+from rateItSeven.senscritiquepages import HomePage
 
 
 LINUX_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36"
@@ -57,7 +58,6 @@ class SensCritique(object):
             userAgent
         )
         self.driver = PhantomJS(desired_capabilities=dcap)
-        self.driver.get(homePage)
 
     def sign_in(self):
         '''
@@ -67,16 +67,14 @@ class SensCritique(object):
         :Return: true if login succeeded, false otherwise
         '''
 
-        self.hoverNode('//*[@id="wrap"]/header/div[1]/div/div/div/div')
+        self.to(HomePage())
 
-        loginField = self.getNode('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/input[1]')
-        passwordField = self.getNode('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/input[2]')
+        self.hoverNode(self.page.alreadySuscribed())
 
-        loginField.send_keys(self.login)
-        passwordField.send_keys(self.password)
+        self.getNode(self.page.loginField()).send_keys(self.login)
+        self.getNode(self.page.passwordField()).send_keys(self.password)
 
-        submit = self.getNode('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/fieldset/input')
-        submit.click()
+        self.getNode(self.page.submitLoginButton()).click()
 
         try:
             currentUser = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="wrap"]/header/div[1]/div/div/div/a[3]')))
@@ -142,4 +140,8 @@ class SensCritique(object):
 
     def waitForNode(self, xpath, condition, timeout = 10):
         return WebDriverWait(self.driver, timeout).until(condition((By.XPATH, xpath)))
+
+    def to(self, page):
+        page.to(self.driver)
+        self.page = page
 
