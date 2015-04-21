@@ -93,7 +93,7 @@ class SensCritique(object):
 
             return False
 
-    def retrieveListById(self, id):
+    def retrieveListById(self, listId):
 
         # Go to Lists page
         self.driver.get(self.PAGE_LISTS.format(self.currentUsername))
@@ -105,8 +105,8 @@ class SensCritique(object):
             children = listNode.find_elements_by_xpath('*')
 
             listUrl = children[1].get_attribute('href')
-            if id in listUrl:
-                result = sclist.SCList(id)
+            if listId in listUrl:
+                result = sclist.SCList(listId)
 
                 result.setTitle(children[1].get_attribute('title'))
                 result.setDescription(children[2].get_attribute('innerHTML'))
