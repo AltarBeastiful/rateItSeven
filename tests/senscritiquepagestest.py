@@ -14,12 +14,12 @@ class Test(unittest.TestCase):
         page = UserPage("toto")
 
         self.assertEqual("toto", page._username)
-        self.assertEqual("http://www.senscritique.com/toto", page._url)
+        self.assertEqual("http://www.senscritique.com/toto", page.url())
 
     def testShouldCreateListCollectionPage(self):
         page = ListCollectionPage("toto")
 
-        self.assertEqual("http://www.senscritique.com/toto/listes/likes", page._url)
+        self.assertEqual("http://www.senscritique.com/toto/listes/likes", page.url())
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
