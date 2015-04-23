@@ -36,12 +36,12 @@ class Page(object):
 
         return node
 
-    def q(self, xpath, timeout = 2):
+    def q(self, xpath, timeout = 2, condition = EC.presence_of_element_located):
         if self._driver is None:
             return None
 
         try:
-            node = self.waitForNode(xpath, EC.presence_of_element_located, 2)
+            node = self.waitForNode(xpath, condition, timeout)
             self.makeAugmentedWebElement(node)
         except (NoSuchElementException, TimeoutException):
             node = None
