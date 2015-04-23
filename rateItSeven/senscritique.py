@@ -69,12 +69,13 @@ class SensCritique(object):
 
         self.to(HomePage())
 
-        self.hoverNode(self.page.alreadySuscribed())
 
-        self.getNode(self.page.loginField()).send_keys(self.login)
-        self.getNode(self.page.passwordField()).send_keys(self.password)
+        self.page.alreadySuscribed().hover()
 
-        self.getNode(self.page.submitLoginButton()).click()
+        self.page.loginField().send_keys(self.login)
+        self.page.passwordField().send_keys(self.password)
+
+        self.page.submitLoginButton().click()
 
         try:
             currentUser = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="wrap"]/header/div[1]/div/div/div/a[3]')))
