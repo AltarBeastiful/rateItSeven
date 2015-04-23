@@ -34,6 +34,11 @@ class Page(object):
         hover = lambda self: ActionChains(self._driver).move_to_element(self).perform()
         node.hover = MethodType(hover, node)
 
+        node.decorateNode = MethodType(self.decorateNode.__func__, node)
+
+        children = lambda self: [self.decorateNode(e) for e in self.find_elements_by_xpath("*")]
+        node.children = MethodType(children, node)
+
         return node
 
     def q(self, xpath, timeout = 2, condition = EC.presence_of_element_located):
