@@ -65,6 +65,17 @@ class Test(unittest.TestCase):
         page.waitForNode.assert_called_once_with('//*[@id="wrap"]/header/div[1]/div/div/div/div',
                                                  EC.presence_of_element_located, 2)
 
+    def testShouldNotCheckAtIfNotSpecified(self):
+        # GIVEN
+        page = HomePage()
+        page.waitForNode = MagicMock()
+
+        # WHEN
+        page.to(MagicMock())
+
+        # THEN
+        self.assertEqual([], page.waitForNode.mock_calls)
+
     def testShouldReturnNoneIfElementNotFound(self):
         #TODO
         self.assertTrue(True)

@@ -24,6 +24,11 @@ class Page(object):
 
         driver.get(self.url())
 
+        try:
+            self.at()
+        except AttributeError:
+            pass
+
     def url(self):
         return self._url
 
