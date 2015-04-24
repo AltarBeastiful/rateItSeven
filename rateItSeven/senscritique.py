@@ -26,7 +26,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from rateItSeven import sclist
-from rateItSeven.senscritiquepages import HomePage
+from rateItSeven.senscritiquepages import HomePage, ListCollectionPage
 
 
 LINUX_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36"
@@ -91,22 +91,14 @@ class SensCritique(object):
             return False
 
     def retrieveListById(self, listId):
+        self.to(ListCollectionPage(self._currentUsername))
 
-        # Go to Lists page
-        self.driver.get(self.PAGE_LISTS.format(self._currentUsername))
-
-        # wait for page to load
-        self.waitForNode('//*[@id="wrap"]/div[4]/div[2]/div/button', EC.element_to_be_clickable)
-
-        for listNode in self.getNodes('//*[@id="wrap"]/div[4]/div[3]/ul/li'):
-            children = listNode.find_elements_by_xpath('*')
-
-            listUrl = children[1].get_attribute('href')
-            if listId in listUrl:
+        for l in self.page.lists():
+            if listId in l.url():
                 result = sclist.SCList(listId)
 
-                result.setTitle(children[1].get_attribute('title'))
-                result.setDescription(children[2].get_attribute('innerHTML'))
+                result.setTitle(l.title())
+                result.setDescription(l.description())
                 result.setType(None) #TODO: parse the type
 
                 return result

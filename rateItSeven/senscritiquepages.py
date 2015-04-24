@@ -61,6 +61,9 @@ class Page(object):
 
         return node
 
+    def qs(self, xpath):
+        return [self.decorateNode(n) for n in self._driver.find_elements_by_xpath(xpath)]
+
     def waitForNode(self, xpath, condition, timeout = 10):
         return WebDriverWait(self._driver, timeout).until(condition((By.XPATH, xpath)))
 
@@ -139,6 +142,9 @@ class ListCollectionPage(UserPage):
         '''
         super().__init__(username)
         self._url += "/listes/likes"
+
+    def lists(self):
+        return [ListModule(n) for n in self.qs('//*[@id="wrap"]/div[4]/div[3]/ul/li')]
 
 class ListModule(Module):
     def __init__(self, root):
