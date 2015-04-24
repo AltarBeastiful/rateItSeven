@@ -86,6 +86,9 @@ class TopBanner(Page):
             childs = self.currentUser().children()
             return childs[1]
 
+    def loginError(self):
+        return self.q('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/fieldset/p')
+
 class HomePage(TopBanner):
 
     def __init__(self):

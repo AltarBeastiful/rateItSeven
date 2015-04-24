@@ -85,10 +85,8 @@ class SensCritique(object):
 
             return True
         else:
-            loginError = self.getNode('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/fieldset/p')
-
-            if loginError is not None:
-                logging.error("Couldn't login : " + loginError.get_attribute('innerHTML'))
+            if self.page.loginError() is not None:
+                logging.error("Couldn't login : " + self.page.loginError().value())
 
             return False
 
