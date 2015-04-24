@@ -143,6 +143,9 @@ class ListCollectionPage(UserPage):
         super().__init__(username)
         self._url += "/listes/likes"
 
+    def at(self):
+        self.waitForNode('//*[@id="wrap"]/div[4]/div[2]/div/button', EC.element_to_be_clickable)
+
     def lists(self):
         return [ListModule(n) for n in self.qs('//*[@id="wrap"]/div[4]/div[3]/ul/li')]
 

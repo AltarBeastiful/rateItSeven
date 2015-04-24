@@ -76,6 +76,17 @@ class Test(unittest.TestCase):
         # THEN
         self.assertEqual([], page.waitForNode.mock_calls)
 
+    def testShouldCheckAtIfSpecified(self):
+        # GIVEN
+        page = ListCollectionPage("toto")
+        page.waitForNode = MagicMock()
+
+        # WHEN
+        page.to(MagicMock())
+
+        # THEN
+        page.waitForNode.assert_called_once_with('//*[@id="wrap"]/div[4]/div[2]/div/button', EC.element_to_be_clickable)
+
     def testShouldReturnNoneIfElementNotFound(self):
         #TODO
         self.assertTrue(True)
