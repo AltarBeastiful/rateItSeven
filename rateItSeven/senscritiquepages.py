@@ -39,6 +39,9 @@ class Page(object):
         children = lambda self: [self.decorateNode(e) for e in self.find_elements_by_xpath("*")]
         node.children = MethodType(children, node)
 
+        value = lambda self: self.get_attribute('innerHTML')
+        node.value = MethodType(value, node)
+
         return node
 
     def q(self, xpath, timeout = 2, condition = EC.presence_of_element_located):
