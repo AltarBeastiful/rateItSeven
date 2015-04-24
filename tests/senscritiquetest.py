@@ -58,10 +58,12 @@ class TestSensCritique(unittest.TestCase):
     def shouldRetrieveListFromId(self):
         listId = "857267"
         listTitle = "Une liste"
+        listDescription = "une descri"
         myList = self.sc.retrieveListById(listId)
 
         self.assertEqual(listId, myList.id())
         self.assertEqual(listTitle, myList.title())
+        self.assertEqual(listDescription, myList.description())
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
