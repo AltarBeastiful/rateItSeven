@@ -28,7 +28,7 @@ class Page(object):
         return self._url
 
 
-    def makeAugmentedWebElement(self, node):
+    def decorateNode(self, node):
         node._driver = self._driver
 
         hover = lambda self: ActionChains(self._driver).move_to_element(self).perform()
@@ -42,7 +42,7 @@ class Page(object):
 
         try:
             node = self.waitForNode(xpath, condition, timeout)
-            self.makeAugmentedWebElement(node)
+            self.decorateNode(node)
         except (NoSuchElementException, TimeoutException):
             node = None
 
