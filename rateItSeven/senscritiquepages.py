@@ -76,6 +76,16 @@ class TopBanner(Page):
     def submitLoginButton(self):
         return self.q('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/fieldset/input')
 
+    def currentUser(self):
+        return self.q('//*[@id="wrap"]/header/div[1]/div/div/div/a[3]');
+
+    def username(self):
+        if self.currentUser() is None:
+            return None
+        else:
+            childs = self.currentUser().children()
+            return childs[1]
+
 class HomePage(TopBanner):
 
     def __init__(self):

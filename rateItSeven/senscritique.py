@@ -77,16 +77,14 @@ class SensCritique(object):
 
         self.page.submitLoginButton().click()
 
-        try:
-            currentUser = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="wrap"]/header/div[1]/div/div/div/a[3]')))
-            currentUserChildNodes = currentUser.find_elements_by_xpath(".//*")
+        currentUser = self.page.username()
 
-            if len(currentUserChildNodes) == 2:
-                self.currentUsername = currentUserChildNodes[1].get_attribute('innerHTML')
-                logging.info("Logged in with user " + self.currentUsername)
+        if currentUser is not None:
+            self._currentUsername = currentUser.value()
+            logging.warn("Logged in with user " + self._currentUsername)
 
             return True
-        except TimeoutException:
+        else:
             loginError = self.getNode('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/fieldset/p')
 
             if loginError is not None:
@@ -97,7 +95,7 @@ class SensCritique(object):
     def retrieveListById(self, listId):
 
         # Go to Lists page
-        self.driver.get(self.PAGE_LISTS.format(self.currentUsername))
+        self.driver.get(self.PAGE_LISTS.format(self._currentUsername))
 
         # wait for page to load
         self.waitForNode('//*[@id="wrap"]/div[4]/div[2]/div/button', EC.element_to_be_clickable)
