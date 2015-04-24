@@ -30,19 +30,15 @@ from rateItSeven.senscritiquepages import HomePage, ListCollectionPage
 
 
 LINUX_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36"
-SC_HOME_PAGE = 'http://senscritique.com'
 
 
 class SensCritique(object):
-
-    # Pages URL
-    PAGE_LISTS = 'http://www.senscritique.com/{}/listes'
 
     '''
     Interact with SensCritique website
     '''
 
-    def __init__(self, login, password, userAgent=LINUX_USER_AGENT, homePage=SC_HOME_PAGE):
+    def __init__(self, login, password, userAgent=LINUX_USER_AGENT):
         '''
         Constructor
 
@@ -68,7 +64,6 @@ class SensCritique(object):
         '''
 
         self.to(HomePage())
-
 
         self.page.alreadySuscribed().hover()
 
@@ -104,31 +99,6 @@ class SensCritique(object):
                 return result
 
         return None
-
-    def getNode(self, xpath):
-        try:
-            node = self.waitForNode(xpath, EC.presence_of_element_located, 2)
-        except (NoSuchElementException, TimeoutException):
-            node = None
-        finally:
-            return node
-
-    def getNodes(self, xpath):
-        return self.driver.find_elements_by_xpath(xpath)
-
-    def hoverNode(self, xpath):
-        node = self.waitForNode(xpath, EC.visibility_of_element_located)
-
-        if node is None:
-            return False
-
-        hover = ActionChains(self.driver).move_to_element(node)
-        hover.perform()
-
-        return True
-
-    def waitForNode(self, xpath, condition, timeout = 10):
-        return WebDriverWait(self.driver, timeout).until(condition((By.XPATH, xpath)))
 
     def to(self, page):
         page.to(self.driver)
