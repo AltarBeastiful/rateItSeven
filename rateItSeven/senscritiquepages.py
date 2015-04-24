@@ -64,6 +64,25 @@ class Page(object):
     def waitForNode(self, xpath, condition, timeout = 10):
         return WebDriverWait(self._driver, timeout).until(condition((By.XPATH, xpath)))
 
+class Module(object):
+
+    def __init__(self, root_node):
+        self._root = root_node
+
+    def qs(self, xpath):
+        return [self.decorateNode(n) for n in self._root.find_elements_by_xpath(xpath)]
+
+    def decorateNode(self, node):
+        node.decorateNode = MethodType(self.decorateNode.__func__, node)
+
+        children = lambda self: [self.decorateNode(e) for e in self.find_elements_by_xpath("*")]
+        node.children = MethodType(children, node)
+
+        value = lambda self: self.get_attribute('innerHTML')
+        node.value = MethodType(value, node)
+
+        return node
+
 class TopBanner(Page):
 
     def __init__(self):
@@ -120,3 +139,17 @@ class ListCollectionPage(UserPage):
         '''
         super().__init__(username)
         self._url += "/listes/likes"
+
+class ListModule(Module):
+    def __init__(self, root):
+        super().__init__(root)
+        self._children = self._root.children()
+
+    def url(self):
+        return self._children[1].get_attribute('href')
+
+    def title(self):
+        return self._children[1].get_attribute('title')
+
+    def description(self):
+        return self._children[2].value()
