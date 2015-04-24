@@ -46,6 +46,7 @@ class TestSensCritique(unittest.TestCase):
         self.shouldFailToLogin()
         self.shouldSuccessLogin()
         self.shouldRetrieveListFromId()
+        self.shouldRetrieveListFromTitle()
 
     def shouldFailToLogin(self):
         self.setupBadLogin()
@@ -60,6 +61,16 @@ class TestSensCritique(unittest.TestCase):
         listTitle = "Une liste"
         listDescription = "une descri"
         myList = self.sc.retrieveListById(listId)
+
+        self.assertEqual(listId, myList.id())
+        self.assertEqual(listTitle, myList.title())
+        self.assertEqual(listDescription, myList.description())
+
+    def shouldRetrieveListFromTitle(self):
+        listId = "857267"
+        listTitle = "Une liste"
+        listDescription = "une descri"
+        myList = self.sc.retrieveListByTitle(listTitle)
 
         self.assertEqual(listId, myList.id())
         self.assertEqual(listTitle, myList.title())

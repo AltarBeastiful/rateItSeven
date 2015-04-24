@@ -154,6 +154,9 @@ class ListModule(Module):
         super().__init__(root)
         self._children = self._root.children()
 
+    def id(self):
+        return self.url().split('/')[-1]
+
     def url(self):
         return self._children[1].get_attribute('href')
 

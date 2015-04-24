@@ -100,6 +100,21 @@ class SensCritique(object):
 
         return None
 
+    def retrieveListByTitle(self, title):
+        self.to(ListCollectionPage(self._currentUsername))
+
+        for l in self.page.lists():
+            if l.title() == title:
+                result = sclist.SCList(l.id())
+
+                result.setTitle(l.title())
+                result.setDescription(l.description())
+                result.setType(None) #TODO: parse the type
+
+                return result
+
+        return None
+
     def to(self, page):
         page.to(self.driver)
         self.page = page
