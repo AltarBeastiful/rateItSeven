@@ -19,7 +19,7 @@
 import os
 import unittest
 
-from rateItSeven.scan import moviescan
+from rateItSeven.scan.moviescan import MovieScanner
 
 
 class TestMovieScan(unittest.TestCase):
@@ -30,7 +30,8 @@ class TestMovieScan(unittest.TestCase):
 
     def test_listallMovies(self):
         movies_count = 0
-        for movie in moviescan.list_movies([self.basedir_abspath]):
+        moviescan = MovieScanner([self.basedir_abspath])
+        for movie in moviescan.list_movies():
             if("movie.mkv" in movie.abs_path):
                 movies_count += 1
         self.assertEqual(2, movies_count)

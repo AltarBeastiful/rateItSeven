@@ -21,9 +21,14 @@ import guessit
 from rateItSeven.scan.containers.movie import MovieGuess
 from rateItSeven.scan.filescanner import FileScanner
 
-def list_movies(dir_paths):
-    fileScanner = FileScanner(dir_paths)
-    for abs_path in fileScanner.absolute_file_paths():
-        movie = MovieGuess(guessit.guess_file_info(abs_path, info=['video', 'filename']), abs_path)
-        if movie.is_movie():
-            yield movie
+class MovieScanner(object):
+
+    def __init__(self, dir_paths : list):
+        self.dir_paths = dir_paths
+
+    def list_movies(self):
+        fileScanner = FileScanner(self.dir_paths)
+        for abs_path in fileScanner.absolute_file_paths():
+            movie = MovieGuess(guessit.guess_file_info(abs_path, info=['video', 'filename']), abs_path)
+            if movie.is_movie():
+                yield movie
