@@ -19,7 +19,7 @@ class TestMovieStore(unittest.TestCase):
         if os.path.isfile(self.storepath):
             os.remove(self.storepath)
 
-    def test_persist(self):
+    def test_persist_shouldCreateFile(self):
         with MovieStore(self.storepath, [self.basedir_abspath]) as store:
             store.persist()
             os.path.isfile(self.storepath)
