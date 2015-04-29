@@ -11,6 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+from rateItSeven.sclist import SCList
 
 
 class Page(object):
@@ -165,3 +166,32 @@ class ListModule(Module):
 
     def description(self):
         return self._children[2].value()
+
+class ListPage(TopBanner):
+
+    def __init__(self, l : SCList):
+        super().__init__()
+        self._url = "http://www.senscritique.com/liste/" + l.title().replace(' ', '_') + "/" + l.id()
+
+    def movie_nodes(self):
+        return self.qs('//*[@id="wrap"]/div[4]/div/div[2]/div[2]/ul/li')
+
+    def movies(self):
+        for node in self.movie_nodes():
+            yield MovieModule(node)
+
+class MovieModule(Module):
+
+    def __init__(self, node):
+        super().__init__(node)
+        self._title_node = self.qs('div[2]/h3/a')[0]
+
+    def url(self):
+        return self._title_node.get_attribute('href')
+
+    def title(self):
+        return self._title_node.value()
+
+    def description(self):
+        return None
+

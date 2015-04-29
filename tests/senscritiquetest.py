@@ -47,6 +47,7 @@ class TestSensCritique(unittest.TestCase):
         self.shouldSuccessLogin()
         self.shouldRetrieveListFromId()
         self.shouldRetrieveListFromTitle()
+        self.shouldRetrieveMoviesFromList()
 
     def shouldFailToLogin(self):
         self.setupBadLogin()
@@ -70,11 +71,18 @@ class TestSensCritique(unittest.TestCase):
         listId = "857267"
         listTitle = "Une liste"
         listDescription = "une descri"
-        myList = self.sc.retrieveListByTitle(listTitle)
+        self.myList = self.sc.retrieveListByTitle(listTitle)
 
-        self.assertEqual(listId, myList.id())
-        self.assertEqual(listTitle, myList.title())
-        self.assertEqual(listDescription, myList.description())
+        self.assertEqual(listId, self.myList.id())
+        self.assertEqual(listTitle, self.myList.title())
+        self.assertEqual(listDescription, self.myList.description())
+
+    def shouldRetrieveMoviesFromList(self):
+        movies = self.sc.retrieveMoviesFromList(self.myList)
+
+        self.assertEqual("Izo", next(movies).title())
+        self.assertEqual("La Maison des 1000 morts", next(movies).title())
+        self.assertEqual("Pi", next(movies).title())
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

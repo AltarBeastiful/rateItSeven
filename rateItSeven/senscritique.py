@@ -26,7 +26,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from rateItSeven import sclist
-from rateItSeven.senscritiquepages import HomePage, ListCollectionPage
+from rateItSeven.senscritiquepages import HomePage, ListCollectionPage, ListPage
 
 
 LINUX_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36"
@@ -114,6 +114,12 @@ class SensCritique(object):
                 return result
 
         return None
+
+    def retrieveMoviesFromList(self, l):
+        self.to(ListPage(l))
+
+        for movie in self.page.movies():
+            yield movie
 
     def to(self, page):
         page.to(self.driver)

@@ -8,7 +8,9 @@ from unittest.mock import MagicMock
 
 from selenium.webdriver.support import expected_conditions as EC
 
-from rateItSeven.senscritiquepages import UserPage, ListCollectionPage, HomePage
+from rateItSeven.sclist import SCList
+from rateItSeven.senscritiquepages import UserPage, ListCollectionPage, HomePage, \
+    ListPage
 
 
 class Test(unittest.TestCase):
@@ -29,6 +31,17 @@ class Test(unittest.TestCase):
         page = HomePage()
 
         self.assertEqual("http://www.senscritique.com/", page.url())
+
+    def testShouldCreateListPage(self):
+        # GIVEN
+        l = SCList("0042")
+        l.setTitle("A title")
+
+        # WHEN
+        page = ListPage(l)
+
+        # THEN
+        self.assertEqual("http://www.senscritique.com/liste/A_title/0042", page.url())
 
     def testShouldGoToURL(self):
         # GIVEN
