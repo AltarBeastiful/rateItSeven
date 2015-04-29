@@ -50,36 +50,59 @@ class TestSensCritique(unittest.TestCase):
         self.shouldRetrieveMoviesFromList()
 
     def shouldFailToLogin(self):
+        # GIVEN
         self.setupBadLogin()
-        self.assertFalse(self.sc.sign_in())
+
+        # WHEN
+        result = self.sc.sign_in()
+
+        # THEN
+        self.assertFalse(result)
 
     def shouldSuccessLogin(self):
+        # GIVEN
         self.setupCorretLogin()
-        self.assertTrue(self.sc.sign_in())
+
+        # WHEN
+        result = self.sc.sign_in()
+
+        # THEN
+        self.assertTrue(result)
 
     def shouldRetrieveListFromId(self):
+        # GIVEN
         listId = "857267"
         listTitle = "Une liste"
         listDescription = "une descri"
+
+        # WHEN
         myList = self.sc.retrieveListById(listId)
 
+        # THEN
         self.assertEqual(listId, myList.id())
         self.assertEqual(listTitle, myList.title())
         self.assertEqual(listDescription, myList.description())
 
     def shouldRetrieveListFromTitle(self):
+        # GIVEN
         listId = "857267"
         listTitle = "Une liste"
         listDescription = "une descri"
+
+        # WHEN
         self.myList = self.sc.retrieveListByTitle(listTitle)
 
+        # THEN
         self.assertEqual(listId, self.myList.id())
         self.assertEqual(listTitle, self.myList.title())
         self.assertEqual(listDescription, self.myList.description())
 
     def shouldRetrieveMoviesFromList(self):
+        # GIVEN
+        # WHEN
         movies = self.sc.retrieveMoviesFromList(self.myList)
 
+        # THEN
         self.assertEqual("Izo", next(movies).title())
         self.assertEqual("La Maison des 1000 morts", next(movies).title())
         self.assertEqual("Pi", next(movies).title())
