@@ -50,7 +50,7 @@ class Page(object):
 
         return node
 
-    def q(self, xpath, timeout = 2, condition = EC.presence_of_element_located):
+    def q(self, xpath, timeout = 5, condition = EC.presence_of_element_located):
         if self._driver is None:
             return None
 
