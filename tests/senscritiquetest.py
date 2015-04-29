@@ -29,8 +29,16 @@ class TestSensCritique(unittest.TestCase):
         self.sc.login = self.goodLogin
 
     def test_shouldChangeMyUserAgent(self):
+        # GIVEN
         expectedUserAgent = "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/5.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C)"
-        sc = SensCritique("", "", expectedUserAgent, "http://gs.statcounter.com/detect")
+        sc = SensCritique("", "", expectedUserAgent)
+
+        # WHEN
+        sc.driver.get("http://gs.statcounter.com/detect")
+        user_agent_node = sc.driver.find_element_by_xpath('//*[@id="content-inner"]/div/p[1]/em')
+
+        # THEN
+        self.assertEqual(expectedUserAgent, user_agent_node.get_attribute('innerHTML'))
 
     def testSensCritique(self):
         # Setup
