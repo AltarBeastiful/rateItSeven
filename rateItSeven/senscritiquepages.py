@@ -193,5 +193,5 @@ class MovieModule(Module):
         return self._title_node.value()
 
     def description(self):
-        return None
-
+        descriptionNode = self.qs('div[2]/div[2]/div')
+        return None if len(descriptionNode) == 0 else descriptionNode[0].value()

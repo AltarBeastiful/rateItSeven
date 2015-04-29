@@ -107,13 +107,19 @@ class TestSensCritique(unittest.TestCase):
 
     def shouldRetrieveMoviesFromList(self):
         # GIVEN
+        expectedMovies = [  {"title" : "Izo", "description" : "Une description d'IZO"}
+                          , {"title" : "La Maison des 1000 morts", "description" : None}
+                          , {"title" : "Pi", "description" : None} ]
+
         # WHEN
         movies = self.sc.retrieveMoviesFromList(self.myList)
 
         # THEN
-        self.assertEqual("Izo", next(movies).title())
-        self.assertEqual("La Maison des 1000 morts", next(movies).title())
-        self.assertEqual("Pi", next(movies).title())
+        for expectedMovie in expectedMovies:
+            movie = next(movies)
+
+            self.assertEqual(expectedMovie["title"], movie.title())
+            self.assertEqual(expectedMovie["description"], movie.description())
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
