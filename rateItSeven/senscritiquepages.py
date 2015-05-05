@@ -172,13 +172,27 @@ class ListPage(TopBanner):
     def __init__(self, l : SCList):
         super().__init__()
         self._url = "http://www.senscritique.com/liste/" + l.title().replace(' ', '_') + "/" + l.id()
+        self._current_page = 1
 
     def movie_nodes(self):
         return self.qs('//*[@id="wrap"]/div[4]/div/div[2]/div[2]/ul/li')
 
     def movies(self):
-        for node in self.movie_nodes():
-            yield MovieModule(node)
+        next_page = True
+
+        while next_page:
+            for node in self.movie_nodes():
+                yield MovieModule(node)
+
+            self._current_page += 1
+            next_button = self.page_button(self._current_page)
+
+            next_page = next_button is not None
+            if next_page:
+                next_button.click()
+
+    def page_button(self, folio):
+        return self.q('//a[@data-sc-pager-page="' + str(folio) + '"]', 0)
 
 class MovieModule(Module):
 

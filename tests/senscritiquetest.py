@@ -56,6 +56,7 @@ class TestSensCritique(unittest.TestCase):
         self.shouldRetrieveListFromId()
         self.shouldRetrieveListFromTitle()
         self.shouldRetrieveMoviesFromList()
+        self.shouldRetrieveAllMoviesFromList()
 
     def shouldFailToLogin(self):
         # GIVEN
@@ -120,6 +121,16 @@ class TestSensCritique(unittest.TestCase):
 
             self.assertEqual(expectedMovie["title"], movie.title())
             self.assertEqual(expectedMovie["description"], movie.description())
+
+    def shouldRetrieveAllMoviesFromList(self):
+        # GIVEN
+        expectedMoviesCount = 70
+
+        # WHEN
+        movies = list(self.sc.retrieveMoviesFromList(self.myList))
+
+        # THEN
+        self.assertEqual(expectedMoviesCount, len(movies))
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
