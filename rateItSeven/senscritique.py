@@ -49,6 +49,7 @@ class SensCritique(object):
             userAgent
         )
         self.driver = PhantomJS(desired_capabilities=dcap)
+        self.driver.set_window_size(1366, 768)
 
     def sign_in(self):
         '''
