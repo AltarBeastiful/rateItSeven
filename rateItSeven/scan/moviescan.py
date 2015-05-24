@@ -18,8 +18,9 @@
 
 import guessit
 
-from rateItSeven.scan.containers.movie import MovieGuess
+from rateItSeven.scan.containers.movieguess import MovieGuess
 from rateItSeven.scan.filescanner import FileScanner
+
 
 class MovieScanner(object):
 
