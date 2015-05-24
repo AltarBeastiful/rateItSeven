@@ -26,7 +26,7 @@ class MovieStore(object):
     '''
 
     def __init__(self, store_file_path : str, movies_dirs : list):
-        self.store_file = open(store_file_path, 'a')
+        self.store_file = open(store_file_path, 'a+')
         self.scanner = MovieScanner(movies_dirs)
 
     def __enter__(self):
