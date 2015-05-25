@@ -21,7 +21,8 @@ from selenium.webdriver import PhantomJS
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from rateItSeven import sclist
-from rateItSeven.senscritiquepages import HomePage, ListCollectionPage, ListPage
+from rateItSeven.senscritiquepages import HomePage, ListCollectionPage, ListPage, \
+    ListModule
 
 
 LINUX_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36"
@@ -86,13 +87,7 @@ class SensCritique(object):
 
         for l in self.page.lists():
             if listId in l.url():
-                result = sclist.SCList(listId)
-
-                result.setTitle(l.title())
-                result.setDescription(l.description())
-                result.setType(None) #TODO: parse the type
-
-                return result
+                return self.createSCListFromListModule(l)
 
         return None
 
@@ -101,13 +96,7 @@ class SensCritique(object):
 
         for l in self.page.lists():
             if l.title() == title:
-                result = sclist.SCList(l.id())
-
-                result.setTitle(l.title())
-                result.setDescription(l.description())
-                result.setType(None) #TODO: parse the type
-
-                return result
+                return self.createSCListFromListModule(l)
 
         return None
 
@@ -121,3 +110,11 @@ class SensCritique(object):
         page.to(self.driver)
         self.page = page
 
+    def createSCListFromListModule(self, module : ListModule):
+        list = sclist.SCList(module.id())
+
+        list.setTitle(module.title())
+        list.setDescription(module.description())
+        list.setType(None)  # TODO: parse the type
+
+        return list

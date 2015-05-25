@@ -165,7 +165,10 @@ class ListModule(Module):
         return self._children[1].get_attribute('title')
 
     def description(self):
-        return self._children[2].value()
+        if len(self._children) < 3:
+            return None
+        else:
+            return self._children[2].value()
 
 class ListPage(TopBanner):
 
