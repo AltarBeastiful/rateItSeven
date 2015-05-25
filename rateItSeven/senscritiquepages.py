@@ -197,6 +197,12 @@ class ListPage(TopBanner):
     def page_button(self, folio):
         return self.q('//a[@data-sc-pager-page="' + str(folio) + '"]', 0)
 
+    def query_input(self):
+        return self.q('//*[@id="new-list-item"]')
+
+    def add_movie_button(self, index):
+        return self.q('//*[@id="new-item-results"]/li[' + str(index + 1) + ']/div[2]/form/fieldset/button', 8)
+
 class MovieModule(Module):
 
     def __init__(self, node):

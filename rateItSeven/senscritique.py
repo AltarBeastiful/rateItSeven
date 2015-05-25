@@ -23,6 +23,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from rateItSeven import sclist
 from rateItSeven.senscritiquepages import HomePage, ListCollectionPage, ListPage, \
     ListModule
+from rateItSeven.sclist import SCList
 
 
 LINUX_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36"
@@ -105,6 +106,18 @@ class SensCritique(object):
 
         for movie in self.page.movies():
             yield movie
+
+    def addMovie(self, movie, l : SCList):
+        self.to(ListPage(l))
+
+        self.page.query_input().send_keys(movie)
+
+        add_button = self.page.add_movie_button(0)
+        if add_button is None:
+            return False
+
+        add_button.click()
+        return True
 
     def to(self, page):
         page.to(self.driver)

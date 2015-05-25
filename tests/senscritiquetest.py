@@ -57,6 +57,7 @@ class TestSensCritique(unittest.TestCase):
         self.shouldRetrieveListFromTitle()
         self.shouldRetrieveMoviesFromList()
         self.shouldRetrieveAllMoviesFromList()
+        self.shouldAddMoviesToList()
 
     def shouldFailToLogin(self):
         # GIVEN
@@ -131,6 +132,32 @@ class TestSensCritique(unittest.TestCase):
 
         # THEN
         self.assertEqual(expectedMoviesCount, len(movies))
+
+    def shouldAddMoviesToList(self):
+        # GIVEN
+        listId = "895339"
+        movie1 = "maison 1000 morts"
+        movie2 = 'The Green Mile'
+        movie3 = 'Kick-Ass'
+
+        expectedMovies = ["La Maison des 1000 morts", "La Ligne verte", "Kick-Ass"]
+
+        l = self.sc.retrieveListById(listId);
+        self.newList = l  # Save it for later tests
+
+        # WHEN
+        self.sc.addMovie(movie1, l);
+        self.sc.addMovie(movie2, l);
+        self.sc.addMovie(movie3, l);
+
+        # THEN
+        movies = self.sc.retrieveMoviesFromList(self.newList)
+
+        for expected in expectedMovies:
+            movie = next(movies, None)
+
+            self.assertTrue(movie is not None, expected)
+            self.assertEqual(expected, movie.title())
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
