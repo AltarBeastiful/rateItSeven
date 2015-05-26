@@ -12,6 +12,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from rateItSeven.sclist import SCList
+from time import sleep
 
 
 class Page(object):
@@ -193,6 +194,7 @@ class ListPage(TopBanner):
             next_page = next_button is not None
             if next_page:
                 next_button.click()
+                sleep(1)
 
     def page_button(self, folio):
         return self.q('//*[@data-sc-pager-page="' + str(folio) + '"]', 0)
