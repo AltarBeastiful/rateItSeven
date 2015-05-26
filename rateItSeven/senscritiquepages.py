@@ -178,7 +178,7 @@ class ListPage(TopBanner):
         self._current_page = 1
 
     def movie_nodes(self):
-        return self.qs('//*[@id="wrap"]/div[4]/div/div[2]/div[2]/ul/li')
+        return self.qs('//*[@data-rel="list-item"]')
 
     def movies(self):
         next_page = True
@@ -195,7 +195,7 @@ class ListPage(TopBanner):
                 next_button.click()
 
     def page_button(self, folio):
-        return self.q('//a[@data-sc-pager-page="' + str(folio) + '"]', 0)
+        return self.q('//*[@data-sc-pager-page="' + str(folio) + '"]', 0)
 
     def query_input(self):
         return self.q('//*[@id="new-list-item"]')
