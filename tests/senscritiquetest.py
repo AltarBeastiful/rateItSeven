@@ -86,12 +86,12 @@ class TestSensCritique(unittest.TestCase):
         listDescription = "une descri"
 
         # WHEN
-        myList = self.sc.retrieveListById(listId)
+        self.myList = self.sc.retrieveListById(listId)
 
         # THEN
-        self.assertEqual(listId, myList.id())
-        self.assertEqual(listTitle, myList.title())
-        self.assertEqual(listDescription, myList.description())
+        self.assertEqual(listId, self.myList.id())
+        self.assertEqual(listTitle, self.myList.title())
+        self.assertEqual(listDescription, self.myList.description())
 
     def shouldRetrieveListFromTitle(self):
         # GIVEN
