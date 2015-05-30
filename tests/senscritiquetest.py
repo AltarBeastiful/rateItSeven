@@ -68,6 +68,7 @@ class TestSensCritique(unittest.TestCase):
 
         # THEN
         self.assertFalse(result)
+        self.assertFalse(self.sc.is_logged_in())
 
     def shouldSuccessLogin(self):
         # GIVEN
@@ -78,6 +79,7 @@ class TestSensCritique(unittest.TestCase):
 
         # THEN
         self.assertTrue(result)
+        self.assertTrue(self.sc.is_logged_in())
 
     def shouldRetrieveListFromId(self):
         # GIVEN

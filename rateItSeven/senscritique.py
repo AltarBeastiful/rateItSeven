@@ -83,6 +83,9 @@ class SensCritique(object):
 
             return False
 
+    def is_logged_in(self):
+        return self.page is not None and self.page.username() is not None;
+
     def retrieveListById(self, listId):
         self.to(ListCollectionPage(self._currentUsername))
 
