@@ -37,6 +37,37 @@ class TestMovieStore(unittest.TestCase):
             store.persist_scanned_changes()
             os.path.isfile(self.storepath)
 
+    def test_pullChanges_allMoviesShouldBeAdded(self):
+        with MovieStore(self.storepath, [self.basedir_abspath]) as store:
+            store_state = store.pull_changes()
+            self.assertEqual(2, len(store_state.added))
+
+    def test_pullChanges_allMoviesShouldAlreadyExist(self):
+        with MovieStore(self.storepath, [self.basedir_abspath]) as store:
+            store.persist_scanned_changes()
+            store_state = store.pull_changes()
+            self.assertEqual(2, len(store_state.existing))
+
+    def test_pullChanges_oneDeleted(self):
+        with MovieStore(self.storepath, [self.basedir_abspath]) as store:
+            #Create a video file
+            movieToDeletePath = self.createFakeVideoFile()
+
+            #Tell the store to persist changes
+            store.persist_scanned_changes()
+
+            #Remove the file and pull the changes
+            os.remove(movieToDeletePath)
+            store_state = store.pull_changes()
+
+            self.assertEqual(1, len(store_state.deleted))
+
+    def createFakeVideoFile(self):
+        movieToDeletePath = self.basedir_abspath + "/movieToDelete.avi"
+        movieToDelete = open(movieToDeletePath, 'w')
+        movieToDelete.write("fakeContent")
+        movieToDelete.close()
+        return movieToDeletePath
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
