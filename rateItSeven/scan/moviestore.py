@@ -18,7 +18,7 @@
 
 import json
 
-from rateItSeven.scan.moviescan import MovieScanner
+from rateItSeven.scan.moviescanner import MovieScanner
 
 class MovieStore(object):
     '''

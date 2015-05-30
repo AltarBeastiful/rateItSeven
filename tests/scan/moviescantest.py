@@ -19,7 +19,7 @@
 import os
 import unittest
 
-from rateItSeven.scan.moviescan import MovieScanner
+from rateItSeven.scan.moviescanner import MovieScanner
 
 
 class TestMovieScan(unittest.TestCase):
