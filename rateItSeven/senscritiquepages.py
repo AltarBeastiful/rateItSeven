@@ -195,6 +195,12 @@ class ListPage(TopBanner):
     def add_movie_button(self, index):
         return self.q('//*[@id="new-item-results"]/li[' + str(index + 1) + ']/div[2]/form/fieldset/button', 8)
 
+    def movie_description_field(self, index):
+        return self.q('//*[@id="new-item-results"]/li[' + str(index + 1) + ']/div[2]/form/fieldset/textarea', 8)
+
+    def description_node(self):
+        return self.q('//*[@id="description-update"]')
+
 class MovieModule(Module):
 
     def __init__(self, node):
@@ -209,7 +215,7 @@ class MovieModule(Module):
 
     def description(self):
         descriptionNode = self.qs('div[2]/div[2]/div')
-        return None if len(descriptionNode) == 0 else descriptionNode[0].value()
+        return "" if len(descriptionNode) == 0 else descriptionNode[0].value()
 
     def delete_button(self):
         return self.qs('//*[@data-rel="sc-item-delete"]')[0]

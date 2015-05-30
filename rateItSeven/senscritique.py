@@ -114,11 +114,14 @@ class SensCritique(object):
     def addMovie(self, movie, l : SCList):
         self.to(ListPage(l))
 
-        self.page.query_input().send_keys(movie)
+        self.page.query_input().send_keys(movie.title())
 
         add_button = self.page.add_movie_button(0)
         if add_button is None:
-            return False
+            return False  # Movie already in list
+
+        if movie.description():
+            self.page.movie_description_field(0).send_keys(movie.description())
 
         add_button.click()
         sleep(0.200)

@@ -18,6 +18,7 @@
 
 import unittest
 from rateItSeven.senscritique import SensCritique
+from rateItSeven.movie import Movie
 
 
 class TestSensCritique(unittest.TestCase):
@@ -113,8 +114,8 @@ class TestSensCritique(unittest.TestCase):
     def shouldRetrieveMoviesFromList(self):
         # GIVEN
         expectedMovies = [  {"title" : "Izo", "description" : "Une description d'IZO"}
-                          , {"title" : "La Maison des 1000 morts", "description" : None}
-                          , {"title" : "Pi", "description" : None} ]
+                          , {"title" : "La Maison des 1000 morts", "description" : ""}
+                          , {"title" : "Pi", "description" : ""} ]
 
         # WHEN
         movies = self.sc.retrieveMoviesFromList(self.myList)
@@ -139,11 +140,11 @@ class TestSensCritique(unittest.TestCase):
     def shouldAddMoviesToList(self):
         # GIVEN
         listId = "895339"
-        movie1 = "maison 1000 morts"
-        movie2 = 'The Green Mile'
-        movie3 = 'Kick-Ass'
+        movie1 = Movie("maison 1000 morts", "une descr")
+        movie2 = Movie('The Green Mile')
+        movie3 = Movie('Kick-Ass')
 
-        expectedMovies = ["La Maison des 1000 morts", "La Ligne verte", "Kick-Ass"]
+        expectedMovies = [Movie("La Maison des 1000 morts", "une descr"), Movie("La Ligne verte"), Movie("Kick-Ass")]
 
         l = self.sc.retrieveListById(listId);
         self.newList = l  # Save it for later tests
@@ -160,7 +161,8 @@ class TestSensCritique(unittest.TestCase):
             movie = next(movies, None)
 
             self.assertTrue(movie is not None, expected)
-            self.assertEqual(expected, movie.title())
+            self.assertEqual(expected.title(), movie.title())
+            self.assertEqual(expected.description(), movie.description())
 
     def shouldDeleteMovies(self):
         # GIVEN
