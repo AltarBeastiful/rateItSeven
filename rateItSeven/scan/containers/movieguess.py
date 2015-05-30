@@ -29,6 +29,18 @@ class MovieGuess(object):
         self.guess = guess
         self.abs_path = abs_path
 
+    def __key(self):
+        return (self.abs_path)
+
+    def __eq__(self, other):
+        return self.__key() == other.__key()
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self.__key())
+
     def nice_string(self):
         return self.abs_path + '\n' + self.guess.nice_string()
 
