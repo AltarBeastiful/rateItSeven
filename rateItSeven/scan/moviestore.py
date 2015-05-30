@@ -42,5 +42,6 @@ class MovieStore(object):
         '''
         scanned_movies = list(self.scanner.list_movies())
         self.store_file.write(json.dumps(scanned_movies, default=lambda o: o.__dict__))
+        self.store_file.flush()
 
 
