@@ -34,7 +34,7 @@ class TestMovieStore(unittest.TestCase):
 
     def test_persist_shouldCreateFile(self):
         with MovieStore(self.storepath, [self.basedir_abspath]) as store:
-            store.persist()
+            store.persist_scanned_changes()
             os.path.isfile(self.storepath)
 
 

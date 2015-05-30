@@ -17,6 +17,7 @@
 #
 
 import json
+import os
 
 from rateItSeven.scan.moviescanner import MovieScanner
 
@@ -35,6 +36,11 @@ class MovieStore(object):
     def __exit__(self, thetype, value, traceback):
         self.store_file.close()
 
-    def persist(self):
-        self.store_file.write(json.dumps(list(self.scanner.list_movies()), default=lambda o: o.__dict__))
+    def persist_scanned_changes(self):
+        '''
+        Persist all movies found at movies_dirs to the store file
+        '''
+        scanned_movies = list(self.scanner.list_movies())
+        self.store_file.write(json.dumps(scanned_movies, default=lambda o: o.__dict__))
+
 
