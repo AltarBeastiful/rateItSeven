@@ -24,6 +24,7 @@ from rateItSeven import sclist
 from rateItSeven.senscritiquepages import HomePage, ListCollectionPage, ListPage, \
     ListModule
 from rateItSeven.sclist import SCList
+from time import sleep
 
 
 LINUX_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36"
@@ -120,6 +121,7 @@ class SensCritique(object):
             return False
 
         add_button.click()
+        sleep(0.200)
         return True
 
     def to(self, page):
