@@ -210,3 +210,10 @@ class MovieModule(Module):
     def description(self):
         descriptionNode = self.qs('div[2]/div[2]/div')
         return None if len(descriptionNode) == 0 else descriptionNode[0].value()
+
+    def delete_button(self):
+        return self.qs('//*[@data-rel="sc-item-delete"]')[0]
+
+    def confirm_delete_button(self):
+        return self.q('//button[@data-rel="sc-message-button-ok"]')
+

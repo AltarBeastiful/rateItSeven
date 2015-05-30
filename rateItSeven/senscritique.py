@@ -124,6 +124,23 @@ class SensCritique(object):
         sleep(0.200)
         return True
 
+    def deleteMovies(self, movies_to_delete, l : SCList):
+        self.to(ListPage(l))
+
+        for movie in self.page.movies():
+            try:
+                movies_to_delete.remove(movie.title())
+
+                delete = movie.delete_button()
+                delete.click()
+
+                movie.confirm_delete_button().click()
+                sleep(0.300)
+            except Exception as e:
+                logging.error("Fail to delete movie " + movie.title() + ". " + format(e))
+
+        return movies_to_delete
+
     def to(self, page):
         page.to(self.driver)
         self.page = page

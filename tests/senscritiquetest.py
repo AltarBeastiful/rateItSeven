@@ -58,6 +58,7 @@ class TestSensCritique(unittest.TestCase):
         self.shouldRetrieveMoviesFromList()
         self.shouldRetrieveAllMoviesFromList()
         self.shouldAddMoviesToList()
+        self.shouldDeleteMovies()
 
     def shouldFailToLogin(self):
         # GIVEN
@@ -160,6 +161,17 @@ class TestSensCritique(unittest.TestCase):
 
             self.assertTrue(movie is not None, expected)
             self.assertEqual(expected, movie.title())
+
+    def shouldDeleteMovies(self):
+        # GIVEN
+        movies = ["La Maison des 1000 morts", "La Ligne verte", "Kick-Ass"]
+
+        # WHEN
+        self.sc.deleteMovies(movies, self.newList)
+
+        # THEN
+        movies = self.sc.retrieveMoviesFromList(self.newList)
+        self.assertTrue(next(movies, None) is None)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
