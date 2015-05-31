@@ -148,12 +148,31 @@ class ListCollectionPage(UserPage):
         '''
         super().__init__(username)
         self._url += "/listes/likes"
+        self._current_page = 1
 
     def at(self):
         self.waitForNode('//*[@id="wrap"]/div[4]/div[2]/div/button', EC.element_to_be_clickable)
 
     def lists(self):
-        return [ListModule(n) for n in self.qs('//*[@id="wrap"]/div[4]/div[3]/ul/li')]  # TODO: Support multiple pages
+        next_page = True
+
+        while next_page:
+            for node in self.list_nodes():
+                yield ListModule(node)
+
+            self._current_page += 1
+            next_button = self.page_button(self._current_page)
+
+            next_page = next_button is not None
+            if next_page:
+                next_button.click()
+                sleep(1)  # TODO: wait for a node instead of sleep
+
+    def list_nodes(self):
+        return self.qs('//*[@id="wrap"]/div[4]/div[3]/ul/li')
+
+    def page_button(self, i):
+        return self.q('//*[@data-sc-pager-page="' + str(i) + '"]', 0)
 
     def create_list_button(self):
         return self.q('//*[@data-rel="sc-list-new"]')
