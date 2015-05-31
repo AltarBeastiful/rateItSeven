@@ -122,6 +122,7 @@ class SensCritique(object):
 
         self.page.confirm_create_list_button().click()
 
+        # TODO : wait for list page to load
         url = self.driver.current_url
         l._id = url[url.rfind("/") + 1:]
 

@@ -34,6 +34,7 @@ class Page(object):
         self._driver = None
 
 
+    # TODO: should check if you're already 'at' the page. Don't get the page if it's the case
     def to(self, driver : WebDriver):
         self._driver = driver
 
@@ -152,7 +153,7 @@ class ListCollectionPage(UserPage):
         self.waitForNode('//*[@id="wrap"]/div[4]/div[2]/div/button', EC.element_to_be_clickable)
 
     def lists(self):
-        return [ListModule(n) for n in self.qs('//*[@id="wrap"]/div[4]/div[3]/ul/li')]
+        return [ListModule(n) for n in self.qs('//*[@id="wrap"]/div[4]/div[3]/ul/li')]  # TODO: Support multiple pages
 
     def create_list_button(self):
         return self.q('//*[@data-rel="sc-list-new"]')
@@ -212,7 +213,7 @@ class ListPage(TopBanner):
             next_page = next_button is not None
             if next_page:
                 next_button.click()
-                sleep(1)
+                sleep(1)  # TODO: wait for a node instead of sleep
 
     def page_button(self, folio):
         return self.q('//*[@data-sc-pager-page="' + str(folio) + '"]', 0)

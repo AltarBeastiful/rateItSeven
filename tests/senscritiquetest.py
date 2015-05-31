@@ -169,6 +169,8 @@ class TestSensCritique(unittest.TestCase):
 
         # TODO: check if the movies were not there before
 
+        # TODO: check if the movies were not there before
+
         # WHEN
         self.sc.addMovie(movie1, self.newList);
         self.sc.addMovie(movie2, self.newList);
