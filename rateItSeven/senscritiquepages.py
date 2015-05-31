@@ -252,6 +252,27 @@ class ListPage(TopBanner):
     def description_node(self):
         return self.q('//*[@id="description-update"]')
 
+    def description(self):
+        if "elme-description-update" in self.description_node().get_attribute("class"):
+            return self.description_node().value()
+        else:
+            return ""
+
+    def description_field(self):
+        return self.q('//textarea[@name="description"]')
+
+    def save_description_button(self):
+        return self.q('//input[contains(concat(" ", normalize-space(@class), " "), " d-button-success ")]')
+
+    def set_description(self, description):
+        self.description_node().click()
+
+        field = self.description_field()
+        field.clear()
+        field.send_keys(description)
+
+        self.save_description_button().click()
+
 class MovieModule(Module):
 
     def __init__(self, node):

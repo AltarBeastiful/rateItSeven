@@ -122,7 +122,12 @@ class SensCritique(object):
 
         self.page.confirm_create_list_button().click()
 
-        # TODO : wait for list page to load
+        # Change the current page as we are now on the list page
+        self.page = ListPage(l)
+        self.page._driver = self.driver  # TODO: fixme, we don't want to use self.to(page) as it would reload the page
+
+        self.page.set_description(l.description())
+
         url = self.driver.current_url
         l._id = url[url.rfind("/") + 1:]
 
