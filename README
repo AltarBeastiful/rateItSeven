@@ -1,8 +1,0 @@
-Dependencies :
-
- * PhantomJS
- * Selenium
- * GuessIt
- * Enzyme (Optional)
-
-sudo pip install selenium guessit enzyme
