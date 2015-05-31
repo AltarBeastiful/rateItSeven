@@ -57,10 +57,10 @@ class TestSensCritique(unittest.TestCase):
         self.shouldFailToLogin()
         self.shouldSuccessLogin()
         self.shouldRetrieveListFromId()
-        self.shouldRetrieveListFromTitle()
         self.shouldRetrieveMoviesFromList()
         self.shouldRetrieveAllMoviesFromList()
         self.shouldCreateList()
+        self.shouldRetrieveListFromTitle()
         self.shouldAddMoviesToList()
         self.shouldDeleteMovies()
 
@@ -94,20 +94,6 @@ class TestSensCritique(unittest.TestCase):
 
         # WHEN
         self.myList = self.sc.retrieveListById(listId)
-
-        # THEN
-        self.assertEqual(listId, self.myList.id())
-        self.assertEqual(listTitle, self.myList.title())
-        self.assertEqual(listDescription, self.myList.description())
-
-    def shouldRetrieveListFromTitle(self):
-        # GIVEN
-        listId = "857267"
-        listTitle = "Une liste"
-        listDescription = "une descri"
-
-        # WHEN
-        self.myList = self.sc.retrieveListByTitle(listTitle)
 
         # THEN
         self.assertEqual(listId, self.myList.id())
@@ -156,6 +142,18 @@ class TestSensCritique(unittest.TestCase):
         self.assertTrue(l.isValid())
 
         self.newList = l  # Save it for later tests
+
+    def shouldRetrieveListFromTitle(self):
+        # GIVEN
+        title = self.newList.title()
+
+        # WHEN
+        myList = self.sc.retrieveListByTitle(title)
+
+        # THEN
+        self.assertEqual(self.newList.id(), myList.id())
+        self.assertEqual(self.newList.title(), myList.title())
+        self.assertEqual(self.newList.description(), myList.description())
 
     def shouldAddMoviesToList(self):
         # GIVEN
