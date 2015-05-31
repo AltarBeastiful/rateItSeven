@@ -111,6 +111,22 @@ class SensCritique(object):
         for movie in self.page.movies():
             yield movie
 
+    def createList(self, l : SCList):
+        self.to(ListCollectionPage(self._currentUsername))
+
+        self.page.create_list_button().click()
+
+        self.page.new_list_title().send_keys(l.title())
+        self.page.film_type_radio().click()
+        self.page.classic_list_radio().click()
+
+        self.page.confirm_create_list_button().click()
+
+        url = self.driver.current_url
+        l._id = url[url.rfind("/") + 1:]
+
+        return l
+
     def addMovie(self, movie, l : SCList):
         self.to(ListPage(l))
 

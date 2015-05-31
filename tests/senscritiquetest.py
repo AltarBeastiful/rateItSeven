@@ -19,6 +19,8 @@
 import unittest
 from rateItSeven.senscritique import SensCritique
 from rateItSeven.movie import Movie
+from rateItSeven.sclist import SCList, ArtType
+import datetime
 
 
 class TestSensCritique(unittest.TestCase):
@@ -58,6 +60,7 @@ class TestSensCritique(unittest.TestCase):
         self.shouldRetrieveListFromTitle()
         self.shouldRetrieveMoviesFromList()
         self.shouldRetrieveAllMoviesFromList()
+        self.shouldCreateList()
         self.shouldAddMoviesToList()
         self.shouldDeleteMovies()
 
@@ -137,22 +140,39 @@ class TestSensCritique(unittest.TestCase):
         # THEN
         self.assertEqual(expectedMoviesCount, len(movies))
 
+    def shouldCreateList(self):
+        # GIVEN
+        l = SCList()
+        l.setTitle("a test list" + str(datetime.datetime.now()))
+        l.setDescription("a description")
+        l.setType(ArtType.film)
+
+        self.assertFalse(l.isValid())
+
+        # WHEN
+        self.sc.createList(l)
+
+        # THEN
+        self.assertTrue(l.isValid())
+
+        self.newList = l  # Save it for later tests
+
     def shouldAddMoviesToList(self):
         # GIVEN
-        listId = "895339"
+        # An SC list (self.newList)
+        # Three movies, one with partial title
         movie1 = Movie("maison 1000 morts", "une descr")
         movie2 = Movie('The Green Mile')
         movie3 = Movie('Kick-Ass')
 
         expectedMovies = [Movie("La Maison des 1000 morts", "une descr"), Movie("La Ligne verte"), Movie("Kick-Ass")]
 
-        l = self.sc.retrieveListById(listId);
-        self.newList = l  # Save it for later tests
+        # TODO: check if the movies were not there before
 
         # WHEN
-        self.sc.addMovie(movie1, l);
-        self.sc.addMovie(movie2, l);
-        self.sc.addMovie(movie3, l);
+        self.sc.addMovie(movie1, self.newList);
+        self.sc.addMovie(movie2, self.newList);
+        self.sc.addMovie(movie3, self.newList);
 
         # THEN
         movies = self.sc.retrieveMoviesFromList(self.newList)

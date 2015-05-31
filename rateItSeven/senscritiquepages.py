@@ -141,6 +141,21 @@ class ListCollectionPage(UserPage):
     def lists(self):
         return [ListModule(n) for n in self.qs('//*[@id="wrap"]/div[4]/div[3]/ul/li')]
 
+    def create_list_button(self):
+        return self.q('//*[@data-rel="sc-list-new"]')
+
+    def new_list_title(self):
+        return self.q('//*[@data-rel="new-list-label"]')
+
+    def film_type_radio(self):
+        return self.q('//*[@id="list-type1"]')
+
+    def classic_list_radio(self):
+        return self.q('//*[@id="list-isUnordered"]')
+
+    def confirm_create_list_button(self):
+        return self.q('//*[@data-rel="submit-new-list"]')
+
 class ListModule(Module):
     def __init__(self, root):
         super().__init__(root)
