@@ -194,8 +194,11 @@ class ListPage(TopBanner):
 
     def __init__(self, l : SCList):
         super().__init__()
-        self._url = "http://www.senscritique.com/liste/" + l.title().replace(' ', '_') + "/" + l.id()
+        self._list = l
         self._current_page = 1
+
+    def url(self):
+        return "http://www.senscritique.com/liste/" + self._list.title().replace(' ', '_') + "/" + self._list.id()
 
     def movie_nodes(self):
         return self.qs('//*[@data-rel="list-item"]')
