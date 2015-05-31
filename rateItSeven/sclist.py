@@ -15,17 +15,21 @@ class SCList(object):
     '''
 
 
-    def __init__(self, id = "0"):
+    def __init__(self, listId=""):
         '''
         Constructor
         '''
-        self._id = id
+        self._id = listId
         self._type = None
         self._title = None
         self._description = None
 
     def isValid(self):
-        return id > 0;
+        try:
+            int(self._id)
+            return True
+        except:
+            return False
 
     def id(self):
         return self._id
