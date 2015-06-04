@@ -32,6 +32,8 @@ LINUX_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l
 
 class SensCritique(object):
 
+    CHANGEPAGE_TIMEOUT = 20
+
     '''
     Interact with SensCritique website
     '''
@@ -71,7 +73,8 @@ class SensCritique(object):
 
         self.page.submitLoginButton().click()
 
-        currentUser = self.page.username()
+        #TODO changing page so wait or something
+        currentUser = self.page.username(self.CHANGEPAGE_TIMEOUT)
 
         if currentUser is not None:
             self._currentUsername = currentUser.value()

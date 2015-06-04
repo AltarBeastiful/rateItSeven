@@ -109,15 +109,16 @@ class TopBanner(Page):
     def submitLoginButton(self):
         return self.q('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/fieldset/input')
 
-    def currentUser(self):
-        return self.q('//*[@id="wrap"]/header/div[1]/div/div/div/a[3]');
+    def currentUser(self, timeout = DEFAULT_TIMEOUT):
+        return self.q('//*[@id="wrap"]/header/div[1]/div/div/div/a[3]', timeout)
 
-    def username(self):
-        if self.currentUser() is None:
+    def username(self, timeout = DEFAULT_TIMEOUT):
+        currentUserNode = self.currentUser(timeout)
+        if currentUserNode is None:
             return None
         else:
-            childs = self.currentUser().children()
-            return childs[1]
+            children = currentUserNode.children()
+            return children[1]
 
     def loginError(self):
         return self.q('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/fieldset/p')
