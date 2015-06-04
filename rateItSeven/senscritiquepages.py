@@ -27,6 +27,8 @@ from selenium.webdriver.support.wait import WebDriverWait
 from rateItSeven.sclist import SCList
 from time import sleep
 
+DEFAULT_TIMEOUT = 5
+NEXTPAGE_TIMEOUT = 20
 
 class Page(object):
 
@@ -65,7 +67,7 @@ class Page(object):
 
         return node
 
-    def q(self, xpath, timeout = 5, condition = EC.presence_of_element_located):
+    def q(self, xpath, timeout = DEFAULT_TIMEOUT, condition=EC.visibility_of_element_located):
         if self._driver is None:
             return None
 
@@ -167,13 +169,17 @@ class ListCollectionPage(UserPage):
             next_page = next_button is not None
             if next_page:
                 next_button.click()
-                sleep(1)  # TODO: wait for a node instead of sleep
+                # Wait till the next page is loaded
+                self.current_page_is(self._current_page)
 
     def list_nodes(self):
         return self.qs('//*[@id="wrap"]/div[4]/div[3]/ul/li')
 
     def page_button(self, i):
         return self.q('//*[@data-sc-pager-page="' + str(i) + '"]', 0)
+
+    def current_page_is(self, i):
+        return self.q('//span[@data-sc-pager-page="' + str(i) + '"]', NEXTPAGE_TIMEOUT)
 
     def create_list_button(self):
         return self.q('//*[@data-rel="sc-list-new"]')
@@ -236,10 +242,14 @@ class ListPage(TopBanner):
             next_page = next_button is not None
             if next_page:
                 next_button.click()
-                sleep(1)  # TODO: wait for a node instead of sleep
+                # Wait till the next page is loaded
+                self.current_page_is(self._current_page)
 
     def page_button(self, folio):
         return self.q('//*[@data-sc-pager-page="' + str(folio) + '"]', 0)
+
+    def current_page_is(self, i):
+        return self.q('//span[@data-sc-pager-page="' + str(i) + '"]', NEXTPAGE_TIMEOUT)
 
     def query_input(self):
         return self.q('//*[@id="new-list-item"]')
