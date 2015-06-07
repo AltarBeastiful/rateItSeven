@@ -164,7 +164,7 @@ class SensCritique(object):
                 delete.click()
 
                 movie.confirm_delete_button().click()
-                sleep(0.300)
+                self.page.wait_loading_finished()
             except Exception as e:
                 logging.error("Fail to delete movie " + movie.title() + ". " + format(e))
 

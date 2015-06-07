@@ -292,6 +292,11 @@ class ListPage(TopBanner):
 
         self.save_description_button().click()
 
+    def wait_loading_finished(self):
+        WebDriverWait(self._driver, NEXTPAGE_TIMEOUT).until(
+            EC.invisibility_of_element_located((By.XPATH, '//div[@data-rel="list-content" and contains(concat(" ", normalize-space(@class), " "), " d-loader-container ")]'))
+        )
+
 class MovieModule(Module):
 
     def __init__(self, node):
