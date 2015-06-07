@@ -32,7 +32,7 @@ class TestMovieScan(unittest.TestCase):
         movies_count = 0
         moviescan = MovieScanner([self.basedir_abspath])
         for movie in moviescan.list_movies():
-            if("movie.mkv" in movie.abs_path):
+            if(".mkv" in movie.abs_path):
                 movies_count += 1
         self.assertEqual(2, movies_count)
 
