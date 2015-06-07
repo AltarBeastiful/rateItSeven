@@ -89,7 +89,7 @@ class Test(unittest.TestCase):
         # THEN
         self.assertTrue(node is not None)
         page.waitForNode.assert_called_once_with('//*[@id="wrap"]/header/div[1]/div/div/div/div',
-                                                 EC.visibility_of_element_located, 5)
+                                                 EC.visibility_of_element_located, 5, page._driver)
 
     def testShouldNotCheckAtIfNotSpecified(self):
         # GIVEN

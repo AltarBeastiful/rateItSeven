@@ -67,12 +67,17 @@ class Page(object):
 
         return node
 
-    def q(self, xpath, timeout = DEFAULT_TIMEOUT, condition=EC.visibility_of_element_located):
-        if self._driver is None:
+    def q(self, xpath, timeout = DEFAULT_TIMEOUT, condition=EC.visibility_of_element_located, driver = None):
+        # Default node is the root node
+        if driver is None:
+            driver = self._driver
+
+        # We should have a valid node at this point
+        if driver is None:
             return None
 
         try:
-            node = self.waitForNode(xpath, condition, timeout)
+            node = self.waitForNode(xpath, condition, timeout, driver)
             self.decorateNode(node)
         except (NoSuchElementException, TimeoutException):
             node = None
@@ -82,8 +87,11 @@ class Page(object):
     def qs(self, xpath):
         return [self.decorateNode(n) for n in self._driver.find_elements_by_xpath(xpath)]
 
-    def waitForNode(self, xpath, condition, timeout = 10):
-        return WebDriverWait(self._driver, timeout).until(condition((By.XPATH, xpath)))
+    def waitForNode(self, xpath, condition, timeout=10, driver = None):
+        if driver is None:
+            driver = self._driver
+
+        return WebDriverWait(driver, timeout).until(condition((By.XPATH, xpath)))
 
 class Module(Page):
 
@@ -301,7 +309,7 @@ class MovieModule(Module):
         return "" if len(descriptionNode) == 0 else descriptionNode[0].value()
 
     def delete_button(self):
-        return self.qs('//*[@data-rel="sc-item-delete"]')[0]
+        return self.q('//*[@data-rel="sc-item-delete"]', NEXTPAGE_TIMEOUT, EC.visibility_of_element_located, self._root)
 
     def confirm_delete_button(self):
         return self.q('//button[@data-rel="sc-message-button-ok"]')
