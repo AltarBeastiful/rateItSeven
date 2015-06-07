@@ -63,6 +63,7 @@ class TestSensCritique(unittest.TestCase):
         self.shouldRetrieveListFromTitle()
         self.shouldAddMoviesToList()
         self.shouldDeleteMovies()
+        self.shouldDeleteList()
 
     def shouldFailToLogin(self):
         # GIVEN
@@ -194,6 +195,20 @@ class TestSensCritique(unittest.TestCase):
         # THEN
         movies = self.sc.retrieveMoviesFromList(self.newList)
         self.assertTrue(next(movies, None) is None)
+
+    def shouldDeleteList(self):
+        # GIVEN
+        # An SC list (self.newList)
+        deleted = self.sc.retrieveListById(self.newList.id())
+        self.assertIsNotNone(deleted)
+
+        # WHEN
+        self.sc.deleteList(self.newList)
+
+        deleted = self.sc.retrieveListById(self.newList.id())
+
+        # THEN
+        self.assertIsNone(deleted)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

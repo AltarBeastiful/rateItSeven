@@ -212,16 +212,23 @@ class ListModule(Module):
         return self.url().split('/')[-1]
 
     def url(self):
-        return self._children[1].get_attribute('href')
+        return self.title_node().get_attribute('href')
 
     def title(self):
-        return self._children[1].get_attribute('title')
+        return self.title_node().get_attribute('title')
 
     def description(self):
         if len(self._children) < 3:
             return None
         else:
             return self._children[2].value()
+
+    def title_node(self):
+        return self._children[1]
+
+    def delete_button(self):
+        return self.q('//button[@data-rel="sc-list-delete" and @data-sc-list-id="' + self.id() + '"]',
+                      DEFAULT_TIMEOUT, EC.presence_of_element_located)
 
 class ListPage(TopBanner):
 

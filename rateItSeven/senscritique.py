@@ -17,7 +17,7 @@
 #
 
 import logging
-from selenium.webdriver import PhantomJS
+from selenium.webdriver import PhantomJS, ActionChains
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from rateItSeven import sclist
@@ -108,7 +108,7 @@ class SensCritique(object):
 
         return None
 
-    def retrieveMoviesFromList(self, l):
+    def retrieveMoviesFromList(self, l : SCList):
         self.to(ListPage(l))
 
         for movie in self.page.movies():
@@ -135,6 +135,24 @@ class SensCritique(object):
         l._id = url[url.rfind("/") + 1:]
 
         return l
+
+    def deleteList(self, l : sclist):
+        self.to(ListCollectionPage(self._currentUsername))
+
+        for module in self.page.lists():
+            if l.id() in module.url():
+
+                # Alert box will be auto-accepted. Needed as Phantomjs cannot handle them
+                self.driver.execute_script("window.confirm = function(msg) { return true; };")
+
+                delete_button = module.delete_button()
+
+                delete_action = ActionChains(self.driver)
+                delete_action.move_to_element(module.title_node())
+                delete_action.move_to_element(delete_button)
+                delete_action.click(delete_button)
+
+                delete_action.perform()
 
     def addMovie(self, movie: Movie, l : SCList):
         self.to(ListPage(l))

@@ -50,6 +50,12 @@ class SCList(object):
     def title(self):
         return self._title
 
+    def url(self):
+        if self.isValid() and self.title() is not None:
+            return "http://www.senscritique.com/liste/" + self.title().replace(' ', '_') + "/" + self.id()
+        else:
+            return None
+
     def setTitle(self, title):
         self._title = title
 
