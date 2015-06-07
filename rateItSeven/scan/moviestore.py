@@ -30,7 +30,7 @@ class MovieStore(object):
 
     def __init__(self, store_file_path : str, movies_dirs : list):
         self.store_file_path = store_file_path
-        self.store_file = open(store_file_path, 'a+')
+        self.store_file = open(store_file_path, 'w')
         self.scanner = MovieScanner(movies_dirs)
 
     def __enter__(self):
@@ -44,6 +44,8 @@ class MovieStore(object):
         Persist all movies found at movies_dirs to the store file
         '''
         scanned_movies = list(self.scanner.list_movies())
+        # Overwrite existing content
+        self.store_file.seek(0)
         self.store_file.write(json.dumps(scanned_movies, default=lambda o: o.__dict__))
         self.store_file.flush()
 

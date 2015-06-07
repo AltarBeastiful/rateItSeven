@@ -15,6 +15,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
+import json
 
 import os
 import unittest
@@ -61,6 +62,17 @@ class TestMovieStore(unittest.TestCase):
             store_state = store.pull_changes()
 
             self.assertEqual(1, len(store_state.deleted))
+
+    def test_persist_multipleTimes_shouldRespectJsonFormat(self):
+        with MovieStore(self.storepath, [self.basedir_abspath]) as store:
+            store.persist_scanned_changes()
+            store.persist_scanned_changes()
+            try:
+                json.load(open(self.storepath, "r"))
+                pass
+            except ValueError as e:
+                self.fail("Store file badly formatted")
+
 
     def createFakeVideoFile(self):
         movieToDeletePath = self.basedir_abspath + "/movieToDelete.avi"
