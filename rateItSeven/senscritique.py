@@ -21,6 +21,7 @@ from selenium.webdriver import PhantomJS
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from rateItSeven import sclist
+from rateItSeven.movie import Movie
 from rateItSeven.senscritiquepages import HomePage, ListCollectionPage, ListPage, \
     ListModule
 from rateItSeven.sclist import SCList
@@ -136,7 +137,7 @@ class SensCritique(object):
 
         return l
 
-    def addMovie(self, movie, l : SCList):
+    def addMovie(self, movie: Movie, l : SCList):
         self.to(ListPage(l))
 
         self.page.query_input().send_keys(movie.title())
