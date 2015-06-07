@@ -35,7 +35,7 @@ class SCList(object):
         self._id = listId
         self._type = None
         self._title = None
-        self._description = None
+        self._description = ""
 
     def isValid(self):
         try:
