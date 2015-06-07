@@ -15,13 +15,15 @@
 #   You should have received a copy of the GNU General Public License
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
+from guessit import Guess
+
 
 class MovieGuess(object):
     '''
     Data struct for guessed data on a movie
     '''
 
-    def __init__(self, guess, abs_path):
+    def __init__(self, guess: Guess, abs_path):
         '''
         :param guess: a Guess object containing movie infos
         :param abs_path: the full path of the movie file
@@ -43,6 +45,9 @@ class MovieGuess(object):
 
     def nice_string(self):
         return self.abs_path + '\n' + self.guess.nice_string()
+
+    def get(self, key):
+        return self.guess.get(key)
 
     def is_movie(self):
         mimetype = self.guess.get("mimetype")
