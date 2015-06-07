@@ -25,7 +25,6 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from rateItSeven.sclist import SCList
-from time import sleep
 
 DEFAULT_TIMEOUT = 5
 NEXTPAGE_TIMEOUT = 20
