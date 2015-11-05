@@ -200,6 +200,12 @@ class ListCollectionPage(UserPage):
     def classic_list_radio(self):
         return self.q('//*[@id="list-isUnordered"]')
 
+    def public_list_radio(self):
+        return self.q('//*[@id="list-isPublic"]')
+
+    def private_list_radio(self):
+        return self.q('//*[@id="list-isPrivate"]')
+
     def confirm_create_list_button(self):
         return self.q('//*[@data-rel="submit-new-list"]')
 

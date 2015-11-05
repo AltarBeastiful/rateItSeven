@@ -122,6 +122,7 @@ class SensCritique(object):
         self.page.new_list_title().send_keys(l.title())
         self.page.film_type_radio().click()
         self.page.classic_list_radio().click()
+        self.page.public_list_radio().click()
 
         self.page.confirm_create_list_button().click()
 
