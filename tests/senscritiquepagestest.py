@@ -74,7 +74,7 @@ class Test(unittest.TestCase):
         node = page.alreadySuscribed()
 
         # THEN
-        self.assertTrue(node is None)
+        self.assertIsNone(node)
 
     def testShouldGetNode(self):
         # GIVEN
@@ -87,7 +87,7 @@ class Test(unittest.TestCase):
         node = page.alreadySuscribed()
 
         # THEN
-        self.assertTrue(node is not None)
+        self.assertIsNotNone(node)
         page.waitForNode.assert_called_once_with('//*[@id="wrap"]/header/div[1]/div/div/div/div',
                                                  EC.visibility_of_element_located, 5, page._driver)
 

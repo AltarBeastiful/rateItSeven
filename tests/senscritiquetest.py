@@ -181,7 +181,7 @@ class TestSensCritique(unittest.TestCase):
         for expected in expectedMovies:
             movie = next(movies, None)
 
-            self.assertTrue(movie is not None, expected)
+            self.assertIsNotNone(movie, expected.title())
             self.assertEqual(expected.title(), movie.title())
             self.assertEqual(expected.description(), movie.description())
 
@@ -194,7 +194,7 @@ class TestSensCritique(unittest.TestCase):
 
         # THEN
         movies = self.sc.retrieveMoviesFromList(self.newList)
-        self.assertTrue(next(movies, None) is None)
+        self.assertIsNone(next(movies, None))
 
     def shouldDeleteList(self):
         # GIVEN
