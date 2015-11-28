@@ -171,9 +171,9 @@ class TestSensCritique(unittest.TestCase):
         # TODO: check if the movies were not there before
 
         # WHEN
-        self.sc.addMovie(movie1, self.newList);
-        self.sc.addMovie(movie2, self.newList);
-        self.sc.addMovie(movie3, self.newList);
+        self.sc.addMovie(movie1, self.newList)
+        self.sc.addMovie(movie2, self.newList)
+        self.sc.addMovie(movie3, self.newList)
 
         # THEN
         movies = self.sc.retrieveMoviesFromList(self.newList)
