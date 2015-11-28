@@ -1,11 +1,18 @@
-Dependencies :
+RateItSeven
+===========
+
+.. image:: https://travis-ci.org/AltarBeastiful/rateItSeven.svg
+    :target: https://travis-ci.org/AltarBeastiful/rateItSeven
+    :alt: Build Status
+
+Dependencies
 ==============
 - PhantomJS
 - Selenium
 - GuessIt
 - Enzyme (Optional for a better video files recognition)
 
-How to install :
+How to install
 ================
 Packaging of this project is still under development.
 
