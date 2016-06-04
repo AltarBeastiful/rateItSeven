@@ -18,6 +18,7 @@
 
 import os
 import unittest
+import pathlib
 
 from rateItSeven.scan.filescanner import FileScanner
 
@@ -31,11 +32,15 @@ class TestFileScanner(unittest.TestCase):
 
     def test_findFirstLevelFile(self):
         path_to_find = self.basedir_abspath + "/fake"
-        self.assertTrue(path_to_find in self.scanner.absolute_file_paths(), "first level file not found")
+        self.assertIn(pathlib.Path(path_to_find).as_uri(),
+                      list(pathlib.Path(pathFound).as_uri() for pathFound in self.scanner.absolute_file_paths()),
+                      "first level file not found")
 
     def test_findSubLevelFile(self):
         path_to_find = self.basedir_abspath + "/subdir/fake"
-        self.assertTrue(path_to_find in self.scanner.absolute_file_paths(), "sub level file not found")
+        self.assertIn(pathlib.Path(path_to_find).as_uri(),
+                      list(pathlib.Path(pathFound).as_uri() for pathFound in self.scanner.absolute_file_paths()),
+                      "sub level file not found")
 
     def test_findallFiles(self):
         files_to_find_count = 10
