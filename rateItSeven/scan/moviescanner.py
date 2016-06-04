@@ -30,6 +30,6 @@ class MovieScanner(object):
     def list_movies(self):
         fileScanner = FileScanner(self.dir_paths)
         for abs_path in fileScanner.absolute_file_paths():
-            movie = MovieGuess(guessit.guess_file_info(abs_path, info=['video', 'filename']), abs_path)
+            movie = MovieGuess(guessit.guessit(abs_path), abs_path)
             if movie.is_movie():
                 yield movie
