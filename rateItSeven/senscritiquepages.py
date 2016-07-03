@@ -236,7 +236,7 @@ class ListPage(TopBanner):
         self._current_page = 1
 
     def url(self):
-        return "http://www.senscritique.com/liste/" + self._list.title().replace(' ', '_') + "/" + self._list.id()
+        return self._list.url()
 
     def movie_nodes(self):
         return self.qs('//*[@data-rel="list-item"]')

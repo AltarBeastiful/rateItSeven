@@ -28,13 +28,13 @@ class SCList(object):
     '''
 
 
-    def __init__(self, listId=""):
+    def __init__(self, listId = None, title = None):
         '''
         Constructor
         '''
         self._id = listId
         self._type = None
-        self._title = None
+        self._title = title
         self._description = ""
 
     def isValid(self):
