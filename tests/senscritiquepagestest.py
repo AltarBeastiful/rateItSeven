@@ -88,7 +88,7 @@ class Test(unittest.TestCase):
 
         # THEN
         self.assertIsNotNone(node)
-        page.waitForNode.assert_called_once_with('//*[@id="wrap"]/header/div[1]/div/div/div/div',
+        page.waitForNode.assert_called_once_with('//button[@data-rel="btn-register" and @data-scmodal-type="login"]',
                                                  EC.visibility_of_element_located, 5, page._driver)
 
     def testShouldNotCheckAtIfNotSpecified(self):
@@ -111,7 +111,7 @@ class Test(unittest.TestCase):
         page.to(MagicMock())
 
         # THEN
-        page.waitForNode.assert_called_once_with('//*[@id="wrap"]/div[4]/div[2]/div/button', EC.element_to_be_clickable)
+        page.waitForNode.assert_called_once_with('//button[@data-rel="sc-list-new"]', EC.element_to_be_clickable)
 
     def testShouldReturnNoneIfElementNotFound(self):
         #TODO

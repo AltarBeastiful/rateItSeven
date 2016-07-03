@@ -107,30 +107,22 @@ class TopBanner(Page):
         super().__init__()
 
     def alreadySuscribed(self):
-        return self.q('//*[@id="wrap"]/header/div[1]/div/div/div/div')
+        return self.q('//button[@data-rel="btn-register" and @data-scmodal-type="login"]')
 
     def loginField(self):
-        return self.q('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/input[1]')
+        return self.q('//input[@data-rel="sc-headerSignin-email"]')
 
     def passwordField(self):
-        return self.q('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/input[2]')
+        return self.q('//input[@data-rel="sc-headerSignin-password"]')
 
     def submitLoginButton(self):
-        return self.q('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/fieldset/input')
-
-    def currentUser(self, timeout = DEFAULT_TIMEOUT):
-        return self.q('//*[@id="wrap"]/header/div[1]/div/div/div/a[3]', timeout)
+        return self.q("//input[contains(concat(' ', normalize-space(@class), ' '), ' lahe-signin-confirm ')]")
 
     def username(self, timeout = DEFAULT_TIMEOUT):
-        currentUserNode = self.currentUser(timeout)
-        if currentUserNode is None:
-            return None
-        else:
-            children = currentUserNode.children()
-            return children[1]
+        return self.q("//span[contains(concat(' ', normalize-space(@class), ' '), ' lahe-userMenu-username ')]", timeout)
 
     def loginError(self):
-        return self.q('//*[@id="wrap"]/header/div[1]/div/div/div/div/form/fieldset/p')
+        return self.q('//*[@data-rel="sc-headerSignin-error"]')
 
 class HomePage(TopBanner):
 
@@ -161,7 +153,7 @@ class ListCollectionPage(UserPage):
         self._current_page = 1
 
     def at(self):
-        self.waitForNode('//*[@id="wrap"]/div[4]/div[2]/div/button', EC.element_to_be_clickable)
+        self.waitForNode('//button[@data-rel="sc-list-new"]', EC.element_to_be_clickable)
 
     def lists(self):
         next_page = True
@@ -180,7 +172,7 @@ class ListCollectionPage(UserPage):
                 self.current_page_is(self._current_page)
 
     def list_nodes(self):
-        return self.qs('//*[@id="wrap"]/div[4]/div[3]/ul/li')
+        return self.qs('//div[@data-rel="lists-content"]/ul/li')
 
     def page_button(self, i):
         return self.q('//*[@data-sc-pager-page="' + str(i) + '"]', 0)
@@ -189,7 +181,7 @@ class ListCollectionPage(UserPage):
         return self.q('//span[@data-sc-pager-page="' + str(i) + '"]', NEXTPAGE_TIMEOUT)
 
     def create_list_button(self):
-        return self.q('//*[@data-rel="sc-list-new"]')
+        return self.q('//button[@data-rel="sc-list-new"]')
 
     def new_list_title(self):
         return self.q('//*[@data-rel="new-list-label"]')
@@ -272,7 +264,7 @@ class ListPage(TopBanner):
         return self.q('//span[@data-sc-pager-page="' + str(i) + '"]', NEXTPAGE_TIMEOUT)
 
     def query_input(self):
-        return self.q('//*[@id="new-list-item"]')
+        return self.q('//input[@id="new-list-item"]')
 
     def add_movie_button(self, index):
         return self.q('//*[@id="new-item-results"]/li[' + str(index + 1) + ']/div[2]/form/fieldset/button', 8)
