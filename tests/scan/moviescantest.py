@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 #   === This file is part of RateItSeven ===
 #
 #   Copyright 2015, Paolo de Vathaire <paolo.devathaire@gmail.com>
