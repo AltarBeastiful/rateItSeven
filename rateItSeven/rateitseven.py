@@ -47,7 +47,7 @@ class RateItSeven(object):
         store = MovieStore(self._store_file_path, self._search_paths)
         changes = store.pull_changes()
 
-        for guess in changes.added:
+        for guess in changes["movies"].added:
             self._sc.addMovie(Movie(guess.get("title"), guess.abs_path), self._list)
 
         store.persist_scanned_changes()

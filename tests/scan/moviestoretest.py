@@ -43,14 +43,16 @@ class TestMovieStore(unittest.TestCase):
 
     def test_pullChanges_allMoviesShouldBeAdded(self):
         with MovieStore(self.storepath, [self.basedir_abspath]) as store:
-            store_state = store.pull_changes()
-            self.assertEqual(2, len(store_state.added))
+            store_states = store.pull_changes()
+            self.assertEqual(2, len(store_states["movies"].added))
+            self.assertEqual(1, len(store_states["episodes"].added))
 
     def test_pullChanges_allMoviesShouldAlreadyExist(self):
         with MovieStore(self.storepath, [self.basedir_abspath]) as store:
             store.persist_scanned_changes()
-            store_state = store.pull_changes()
-            self.assertEqual(2, len(store_state.existing))
+            store_states = store.pull_changes()
+            self.assertEqual(2, len(store_states["movies"].existing))
+            self.assertEqual(1, len(store_states["episodes"].existing))
 
     def test_pullChanges_oneDeleted(self):
         with MovieStore(self.storepath, [self.basedir_abspath]) as store:
@@ -62,9 +64,9 @@ class TestMovieStore(unittest.TestCase):
 
             #Remove the file and pull the changes
             os.remove(movieToDeletePath)
-            store_state = store.pull_changes()
+            store_states = store.pull_changes()
 
-            self.assertEqual(1, len(store_state.deleted))
+            self.assertEqual(1, len(store_states["movies"].deleted))
 
     def test_persist_multipleTimes_shouldRespectJsonFormat(self):
         with MovieStore(self.storepath, [self.basedir_abspath]) as store:
