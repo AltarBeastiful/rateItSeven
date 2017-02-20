@@ -34,11 +34,16 @@ class TestMovieScan(unittest.TestCase):
     def test_listallMovies(self):
         movies_count = 0
         moviescan = MovieScanner([self.basedir_abspath])
-        for movie in moviescan.list_movies():
-            if(".mkv" in movie.abs_path):
-                movies_count += 1
+        for _ in moviescan.list_movies():
+            movies_count += 1
         self.assertEqual(2, movies_count)
 
+    def test_list_episodes(self):
+        episode_count = 0
+        moviescan = MovieScanner([self.basedir_abspath])
+        for _ in moviescan.list_episodes():
+            episode_count += 1
+        self.assertEqual(1, episode_count)
+
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

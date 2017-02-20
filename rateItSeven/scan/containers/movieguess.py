@@ -18,7 +18,6 @@
 #   You should have received a copy of the GNU General Public License
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
-from guessit import guessit
 
 
 class MovieGuess(object):
@@ -53,7 +52,13 @@ class MovieGuess(object):
         return self.guess.get(key)
 
     def is_movie(self):
-        mimetype = self.guess.get("mimetype")
-        videotype = self.guess.get("type")
-        return videotype and videotype  == "movie" and mimetype and "video" in mimetype
+        return self.is_video_in_types(["movie"])
 
+    def is_episode(self):
+        return self.is_video_in_types(["episode"])
+
+    def is_video_in_types(self, video_types):
+        mime_type = self.guess.get("mimetype")
+        guessed_video_type = self.guess.get("type")
+        return guessed_video_type and guessed_video_type in video_types \
+            and mime_type and "video" in mime_type

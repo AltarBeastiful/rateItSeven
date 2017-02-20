@@ -46,7 +46,7 @@ class TestFileScanner(unittest.TestCase):
                       "sub level file not found")
 
     def test_findallFiles(self):
-        files_to_find_count = 10
+        files_to_find_count = 11
         self.assertEqual(files_to_find_count, len(list(self.scanner.absolute_file_paths())))
 
 if __name__ == "__main__":

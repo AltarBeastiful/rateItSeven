@@ -26,13 +26,23 @@ from rateItSeven.scan.filescanner import FileScanner
 
 
 class MovieScanner(object):
+    """
+    Scan file system directories for video files
+    Find info for each file wrapped into a MovieGuess
+    """
 
-    def __init__(self, dir_paths : list):
+    def __init__(self, dir_paths: list):
         self.dir_paths = dir_paths
 
     def list_movies(self):
-        fileScanner = FileScanner(self.dir_paths)
-        for abs_path in fileScanner.absolute_file_paths():
-            movie = MovieGuess(guessit.guessit(abs_path), abs_path)
-            if movie.is_movie():
-                yield movie
+        return self.list_videos_in_types(["movie"])
+
+    def list_episodes(self):
+        return self.list_videos_in_types(["episode"])
+
+    def list_videos_in_types(self, video_types):
+        file_scanner = FileScanner(self.dir_paths)
+        for abs_path in file_scanner.absolute_file_paths():
+            guess = MovieGuess(guessit.guessit(abs_path), abs_path)
+            if guess.is_video_in_types(video_types):
+                yield guess
