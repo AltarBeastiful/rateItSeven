@@ -24,21 +24,21 @@ from os import path
 from itertools import chain
 
 class FileScanner:
-    '''
+    """
     Can search files in paths
-    '''
+    """
 
     def __init__(self, dirs):
-        '''
+        """
         :param dirs: dirs to scan
-        '''
+        """
         self.scan_dirs = dirs
 
     def absolute_file_paths(self):
-        '''
+        """
         List all files recursively from the dirs to scan
         :return: list of absolute paths
-        '''
+        """
         for (dirpath, _, filenames) in chain.from_iterable(walk(base_dir) for base_dir in self.scan_dirs):
             for filename in filenames:
                 yield path.abspath(path.join(dirpath, filename))

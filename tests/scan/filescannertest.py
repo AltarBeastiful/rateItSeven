@@ -50,5 +50,4 @@ class TestFileScanner(unittest.TestCase):
         self.assertEqual(files_to_find_count, len(list(self.scanner.absolute_file_paths())))
 
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

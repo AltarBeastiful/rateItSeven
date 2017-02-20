@@ -21,20 +21,20 @@
 
 
 class MovieGuess(object):
-    '''
+    """
     Data struct for guessed data on a movie
-    '''
+    """
 
     def __init__(self, guess, abs_path):
-        '''
+        """
         :param guess: a Guess object containing movie infos
         :param abs_path: the full path of the movie file
-        '''
+        """
         self.guess = guess
         self.abs_path = abs_path
 
     def __key(self):
-        return (self.abs_path)
+        return self.abs_path
 
     def __eq__(self, other):
         return self.__key() == other.__key()

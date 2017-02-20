@@ -20,16 +20,16 @@
 #
 
 class MovieStoreState(object):
-    '''
+    """
     Hold the state of the movie store in the form of three sets of MovieGuess
-    '''
+    """
 
     def __init__(self, added, existing, deleted):
-        '''
+        """
         :param added: set of movies added since last check
         :param existing: set of movies still existing since last check
         :param deleted: set of movies that don't exist anymore
-        '''
+        """
         self.added = added
         self.existing = existing
         self.deleted = deleted

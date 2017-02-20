@@ -27,9 +27,9 @@ from rateItSeven.scan.moviestore import MovieStore
 
 
 class TestMovieStore(unittest.TestCase):
-
     def setUp(self):
-        self.basedir_abspath = os.path.abspath(__file__ + "/../../resources/files_to_scan")
+        self.basedir_abspath = os.path.abspath(
+            __file__ + "/../../resources/files_to_scan")
         self.storepath = os.path.abspath(__file__ + "/../../resources/store")
 
     def tearDown(self):
@@ -56,14 +56,14 @@ class TestMovieStore(unittest.TestCase):
 
     def test_pullChanges_oneDeleted(self):
         with MovieStore(self.storepath, [self.basedir_abspath]) as store:
-            #Create a video file
-            movieToDeletePath = self.createFakeVideoFile()
+            # Create a video file
+            movie_to_delete_path = self.createFakeVideoFile()
 
-            #Tell the store to persist changes
+            # Tell the store to persist changes
             store.persist_scanned_changes()
 
-            #Remove the file and pull the changes
-            os.remove(movieToDeletePath)
+            # Remove the file and pull the changes
+            os.remove(movie_to_delete_path)
             store_states = store.pull_changes()
 
             self.assertEqual(1, len(store_states["movies"].deleted))
@@ -78,14 +78,13 @@ class TestMovieStore(unittest.TestCase):
             except ValueError as e:
                 self.fail("Store file badly formatted")
 
-
     def createFakeVideoFile(self):
-        movieToDeletePath = self.basedir_abspath + "/movieToDelete.avi"
-        movieToDelete = open(movieToDeletePath, 'w')
-        movieToDelete.write("fakeContent")
-        movieToDelete.close()
-        return movieToDeletePath
+        movie_to_delete_path = self.basedir_abspath + "/movieToDelete.avi"
+        movie_to_delete = open(movie_to_delete_path, 'w')
+        movie_to_delete.write("fakeContent")
+        movie_to_delete.close()
+        return movie_to_delete_path
+
 
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
