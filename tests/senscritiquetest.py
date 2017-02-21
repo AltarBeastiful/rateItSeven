@@ -41,7 +41,7 @@ class TestSensCritique(unittest.TestCase):
 
         # WHEN
         sc.driver.get("http://gs.statcounter.com/detect")
-        user_agent_node = sc.driver.find_element_by_xpath('//*[@id="content-inner"]/div/p[1]/em')
+        user_agent_node = sc.driver.find_element_by_xpath('//*[@id="section-faq"]/main/div/div[2]/div/p[1]/em')
 
         # THEN
         self.assertEqual(expectedUserAgent, user_agent_node.get_attribute('innerHTML'))
