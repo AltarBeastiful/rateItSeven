@@ -152,7 +152,7 @@ class ListCollectionPage(UserPage):
         Constructor
         '''
         super().__init__(username)
-        self._url += "/listes/likes"
+        self._url += "/listes/all/likes"
         self._current_page = 1
 
     def at(self):
