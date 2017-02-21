@@ -225,7 +225,9 @@ class ListModule(Module):
             return self._children[2].value()
 
     def title_node(self):
-        return self._children[1]
+        for child in self._children:
+            if child.tag_name == "a":
+                return child
 
     def delete_button(self):
         return self.q('//button[@data-rel="sc-list-delete" and @data-sc-list-id="' + self.id() + '"]',
