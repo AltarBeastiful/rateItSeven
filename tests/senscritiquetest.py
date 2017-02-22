@@ -122,7 +122,7 @@ class TestSensCritique(unittest.TestCase):
 
     def shouldRetrieveAllMoviesFromList(self):
         # GIVEN
-        expectedMoviesCount = 70
+        expectedMoviesCount = 3
 
         # WHEN
         movies = list(self.sc.retrieveMoviesFromList(self.myList))
