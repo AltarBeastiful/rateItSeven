@@ -41,7 +41,7 @@ class Test(unittest.TestCase):
     def testShouldCreateListCollectionPage(self):
         page = ListCollectionPage("toto")
 
-        self.assertEqual("http://www.senscritique.com/toto/listes/likes", page.url())
+        self.assertEqual("http://www.senscritique.com/toto/listes/all/likes", page.url())
 
     def testShouldCreateHomePage(self):
         page = HomePage()

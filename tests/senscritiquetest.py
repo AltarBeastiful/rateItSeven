@@ -92,7 +92,7 @@ class TestSensCritique(unittest.TestCase):
 
     def shouldRetrieveListFromId(self):
         # GIVEN
-        listId = "857267"
+        listId = "1622651"
         listTitle = "Une liste"
         listDescription = "une descri"
 
