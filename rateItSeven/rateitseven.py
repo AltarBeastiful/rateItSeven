@@ -44,13 +44,13 @@ class RateItSeven(object):
         if not self._list.isValid():
             self._sc.createList(self._list)
 
-        store = MovieStore(self._store_file_path, self._search_paths)
-        changes = store.pull_changes()
+        with MovieStore(self._store_file_path, self._search_paths) as store:
+            changes = store.pull_changes()
 
-        for guess in changes["movies"].added:
-            self._sc.addMovie(Movie(guess.get("title"), guess.abs_path), self._list)
+            for guess in changes["movies"].added:
+                self._sc.addMovie(Movie(guess.get("title"), guess.abs_path), self._list)
 
-        store.persist_scanned_changes()
+            store.persist_scanned_changes()
 
 
 if __name__ == '__main__':

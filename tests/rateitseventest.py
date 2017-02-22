@@ -41,7 +41,8 @@ class TestRateItSeven(unittest.TestCase):
     def test_start(self):
         daemon = RateItSeven(self.login, self.password, [self.basedir_abspath], self.store_path)
         daemon.start()
-        store_content = open(self.store_path, 'r').read()
+        with open(self.store_path, 'r') as store:
+            store_content = store.read()
         self.assertTrue("The Big Lebowski" in store_content)
 
 

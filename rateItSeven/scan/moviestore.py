@@ -65,7 +65,8 @@ class MovieStore(object):
         known_movies = set()
         known_episodes = set()
         if os.stat(self.store_file.name).st_size > 0:
-            storestr = open(self.store_file_path).read()
+            with open(self.store_file_path) as store_read:
+                storestr = store_read.read()
             dict_guesses = json.loads(storestr)
             # create a set from loaded dict in order to compare with the set of scanned movies
             for movie in dict_guesses:
