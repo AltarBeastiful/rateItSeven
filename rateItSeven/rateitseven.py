@@ -28,27 +28,31 @@ from rateItSeven.senscritique import SensCritique
 
 class RateItSeven(object):
 
+    # TODO: Lists titles should be configurable by the user
+    _LISTS_LIB = {"movies" : "La clef",
+                  "episodes" : "zodes"}
+
     def __init__(self, login, password, search_path, store_file_path):
         self._search_paths = search_path
         self._store_file_path = store_file_path
 
         self._sc = SensCritique(login, password)
-
-        self._list = SCList()
-        self._list.setTitle("La clef")
-
+        self._lists = {}
     def start(self):
         self._sc.sign_in()
 
-        self._list = self._sc.retrieveListByTitle(self._list.title())
-        if not self._list.isValid():
-            self._sc.createList(self._list)
+        for video_type,title in self._LISTS_LIB.items():
+            current_list = self._sc.retrieveListByTitle(title)
+            if not current_list.isValid():
+                self._sc.createList(current_list)
+            self._lists[video_type] = current_list
 
         with MovieStore(self._store_file_path, self._search_paths) as store:
             changes = store.pull_changes()
 
-            for guess in changes["movies"].added:
-                self._sc.addMovie(Movie(guess.get("title"), guess.abs_path), self._list)
+            for video_type in RateItSeven._LISTS_LIB.keys():
+                for guess in changes[video_type].added:
+                    self._sc.addMovie(Movie(guess.get("title"), guess.abs_path), self._lists[video_type])
 
             store.persist_scanned_changes()
 
