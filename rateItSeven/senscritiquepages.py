@@ -113,13 +113,13 @@ class TopBanner(Page):
         return self.q('//button[@data-rel="btn-register" and @data-scmodal-type="login"]')
 
     def loginField(self):
-        return self.q('//input[@data-rel="sc-headerSignin-email"]')
+        return self.q('//input[@data-rel="sc-hrf-email"]')
 
     def passwordField(self):
-        return self.q('//input[@data-rel="sc-headerSignin-password"]')
+        return self.q('//input[@data-rel="sc-hrf-password"]')
 
     def submitLoginButton(self):
-        return self.q("//input[contains(concat(' ', normalize-space(@class), ' '), ' lahe-signin-confirm ')]")
+        return self.q("//button[@data-rel='sc-login-submit']")
 
     def username(self, timeout = DEFAULT_TIMEOUT):
         return self.q("//span[contains(concat(' ', normalize-space(@class), ' '), ' lahe-userMenu-username ')]", timeout)

@@ -69,7 +69,7 @@ class SensCritique(object):
 
         self.to(HomePage())
 
-        self.page.alreadySuscribed().hover()
+        self.page.alreadySuscribed().click()
 
         self.page.loginField().send_keys(self.login)
         self.page.passwordField().send_keys(self.password)
