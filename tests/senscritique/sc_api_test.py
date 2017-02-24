@@ -22,7 +22,7 @@
 import datetime
 import unittest
 
-from rateItSeven.senscritique.sc_api import AuthSrv, ListSrv, ListType
+from rateItSeven.senscritique.sc_api import AuthSrv, ListSrv, ListType, UnauthorizedException
 
 
 class TestLoginRequest(unittest.TestCase):
@@ -33,12 +33,15 @@ class TestLoginRequest(unittest.TestCase):
         self.password = "12345"
 
     def test_login_success(self):
-        response = AuthSrv(self.login, self.password).dologin()
-        self.assertNotEqual(0, len(response))
+        user = AuthSrv().dologin(email=self.login, password=self.password)
+        self.assertNotEqual(0, len(user.session_cookies))
+
+    def test_login_failure(self):
+        with self.assertRaises(UnauthorizedException) as exc_catcher:
+            response = AuthSrv().dologin(u"alogin", "badpassword")
 
     def test_create_list(self):
-        response = AuthSrv(self.login, self.password).dologin()
-        listsrv = ListSrv(response)
-        response = listsrv.create_list("myList_"+str(datetime.datetime.now()), ListType.MOVIE)
-        self.assertIsNotNone(response)
-
+        user = AuthSrv().dologin(email=self.login, password=self.password)
+        listsrv = ListSrv(user=user)
+        list = listsrv.create_list("myList_"+str(datetime.datetime.now()), ListType.MOVIE)
+        self.assertIsNotNone(list.path)

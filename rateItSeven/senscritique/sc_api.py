@@ -27,17 +27,15 @@ import requests
 from synthetic import synthesize_constructor
 from synthetic import synthesize_property
 
+from rateItSeven.senscritique.domain.list import ListType, List
+from rateItSeven.senscritique.domain.user import User
+
 _HEADERS = {
     'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
     'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
     'accept-encoding': 'gzip, deflate, br',
     'X-Requested-With': 'XMLHttpRequest'
 }
-
-
-class ListType(Enum):
-    MOVIE = "1"
-    SERIE = "4"
 
 
 class ScSrv(ABC):
@@ -51,30 +49,27 @@ class ScSrv(ABC):
         return response
 
 
-@synthesize_property('email', contract=str)
-@synthesize_property('password', contract=str)
-@synthesize_constructor()
 class AuthSrv(ScSrv):
     _URL = "https://www.senscritique.com/sc2/auth/login.json"
 
-    def dologin(self):
+    def dologin(self, email, password):
         """
         Send a login request with the given credentials
         :return: The session cookies returned by SC
-        :rtype: requests.cookies.RequestsCookieJar
+        :rtype: User
         """
         data = {
-            'email': self.email,
-            'pass': self.password,
+            'email': email,
+            'pass': password,
         }
         response = self.send_post(self._URL, headers=_HEADERS, data=data)
         content = json.loads(response.text)
         if not content["json"]["success"]:
             raise UnauthorizedException
-        return response.cookies
+        return User(email=email, password=password, session_cookies=response.cookies)
 
 
-@synthesize_property('session_cookies', contract=requests.cookies.RequestsCookieJar)
+@synthesize_property('user', contract=User)
 @synthesize_constructor()
 class ListSrv(ScSrv):
     _URL_ADD_LIST = "https://www.senscritique.com/lists/add.ajax"
@@ -95,8 +90,8 @@ class ListSrv(ScSrv):
             "is_ordered": 0,
             "is_public": 0
         }
-        response = self.send_post(self._URL_ADD_LIST, headers=_HEADERS, data=data, cookies=self.session_cookies)
-        return response.headers["Location"]
+        response = self.send_post(self._URL_ADD_LIST, headers=_HEADERS, data=data, cookies=self.user.session_cookies)
+        return List(type=list_type, name=name, path=response.headers["Location"])
 
 
 class UnauthorizedException(Exception):
