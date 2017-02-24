@@ -20,27 +20,41 @@
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
 import json
+from abc import ABC
+from enum import Enum
 
 import requests
 from synthetic import synthesize_constructor
 from synthetic import synthesize_property
 
-
 _HEADERS = {
     'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
-    'dnt': '1', 'referer': 'https://www.senscritique.com/',
     'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
     'accept-encoding': 'gzip, deflate, br',
-    'origin': 'https://www.senscritique.com', 'x-requested-with': 'XMLHttpRequest',
-    'accept': 'application/json, text/javascript, */*; q=0.01',
-    'accept-language': 'en,en-US;q=0.8,ja;q=0.6,fr;q=0.4,de;q=0.2,en-ZA;q=0.2'
+    'X-Requested-With': 'XMLHttpRequest'
 }
+
+
+class ListType(Enum):
+    MOVIE = "1"
+    SERIE = "4"
+
+
+class ScSrv(ABC):
+    def send_post(self, url, data=None, json_data=None, **kwargs):
+        response = requests.post(url, data=data, json=json_data, allow_redirects=False, **kwargs)
+        if response.status_code >= 400:
+            raise BadRequestException({
+                "message": "Request didn't terminate correctly",
+                "response": response
+            })
+        return response
 
 
 @synthesize_property('email', contract=str)
 @synthesize_property('password', contract=str)
 @synthesize_constructor()
-class AuthSrv(object):
+class AuthSrv(ScSrv):
     _URL = "https://www.senscritique.com/sc2/auth/login.json"
 
     def dologin(self):
@@ -53,14 +67,41 @@ class AuthSrv(object):
             'email': self.email,
             'pass': self.password,
         }
-        response = requests.post(self._URL, headers=_HEADERS, data=data)
-        if response.status_code != 200:
-            raise Exception
+        response = self.send_post(self._URL, headers=_HEADERS, data=data)
         content = json.loads(response.text)
         if not content["json"]["success"]:
             raise UnauthorizedException
         return response.cookies
 
 
+@synthesize_property('session_cookies', contract=requests.cookies.RequestsCookieJar)
+@synthesize_constructor()
+class ListSrv(ScSrv):
+    _URL_ADD_LIST = "https://www.senscritique.com/lists/add.ajax"
+    _URL_ADD_LIST_ITEM = "https://www.senscritique.com/items/add.ajax"
+    _SUB_TYPE_ID = "22"
+    XPATH_LIST_ITEM_ID_AFTER_ADD = '//li[@data-rel="sc-item-delete"]/@data-sc-item-id'
+
+    def create_list(self, name: str, list_type: ListType):
+        """
+        Create an SC list
+        :param name: The name of the list to create
+        :param list_type: The type of list to create, eg Movie, Serie
+        :return: the SC path to access the list, created by SC using the name and a random id
+        """
+        data = {
+            "label": name,
+            "subtype_id_related": "1",
+            "is_ordered": 0,
+            "is_public": 0
+        }
+        response = self.send_post(self._URL_ADD_LIST, headers=_HEADERS, data=data, cookies=self.session_cookies)
+        return response.headers["Location"]
+
+
 class UnauthorizedException(Exception):
+    pass
+
+
+class BadRequestException(Exception):
     pass
