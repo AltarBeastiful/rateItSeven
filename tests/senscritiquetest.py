@@ -20,7 +20,8 @@
 #
 
 import unittest
-from rateItSeven.senscritique import SensCritique
+
+from rateItSeven.legacysenscritique import LegacySensCritique
 from rateItSeven.movie import Movie
 from rateItSeven.sclist import SCList, ArtType
 import datetime
@@ -37,7 +38,7 @@ class TestSensCritique(unittest.TestCase):
     def test_shouldChangeMyUserAgent(self):
         # GIVEN
         expectedUserAgent = "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/5.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C)"
-        sc = SensCritique("", "", expectedUserAgent)
+        sc = LegacySensCritique("", "", expectedUserAgent)
 
         # WHEN
         sc.driver.get("http://gs.statcounter.com/detect")
@@ -53,7 +54,7 @@ class TestSensCritique(unittest.TestCase):
         self.goodLogin = "legalizme@gmail.com"
         self.password = "12345"
 
-        self.sc = SensCritique("", self.password)
+        self.sc = LegacySensCritique("", self.password)
 
         # Scenarios
 
