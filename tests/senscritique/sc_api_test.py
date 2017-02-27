@@ -31,6 +31,14 @@ class TestLoginRequest(unittest.TestCase):
     def setUp(self):
         self.login = "legalizme@gmail.com"
         self.password = "12345"
+        user = AuthSrv().dologin(email=self.login, password=self.password)
+        listsrv = ListSrv(user=user)
+        list = listsrv.create_list("myTestList_"+str(datetime.datetime.now()), ListType.MOVIE)
+        self.list_id = list.compute_list_id()
+
+    def tearDown(self):
+        # TODO Delete list
+        pass
 
     def test_login_success(self):
         user = AuthSrv().dologin(email=self.login, password=self.password)
@@ -39,6 +47,12 @@ class TestLoginRequest(unittest.TestCase):
     def test_login_failure(self):
         with self.assertRaises(UnauthorizedException) as exc_catcher:
             response = AuthSrv().dologin(u"alogin", "badpassword")
+
+    def test_add_movie(self):
+        response = AuthSrv().dologin(email=self.login, password=self.password)
+        listsrv = ListSrv(response)
+        response = listsrv.add_movie(self.list_id, "11267022", "Un film porno ?")
+        self.assertIsNotNone(response)
 
     def test_create_list(self):
         user = AuthSrv().dologin(email=self.login, password=self.password)

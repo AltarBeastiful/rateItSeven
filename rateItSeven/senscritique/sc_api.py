@@ -21,14 +21,14 @@
 #
 import json
 from abc import ABC
-from enum import Enum
 
 import requests
+from lxml import html
+from rateItSeven.senscritique.domain.user import User
 from synthetic import synthesize_constructor
 from synthetic import synthesize_property
 
 from rateItSeven.senscritique.domain.list import ListType, List
-from rateItSeven.senscritique.domain.user import User
 
 _HEADERS = {
     'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
@@ -83,6 +83,7 @@ class ListSrv(ScSrv):
         :param name: The name of the list to create
         :param list_type: The type of list to create, eg Movie, Serie
         :return: the SC path to access the list, created by SC using the name and a random id
+        :rtype: List
         """
         data = {
             "label": name,
@@ -92,6 +93,27 @@ class ListSrv(ScSrv):
         }
         response = self.send_post(self._URL_ADD_LIST, headers=_HEADERS, data=data, cookies=self.user.session_cookies)
         return List(type=list_type, name=name, path=response.headers["Location"])
+
+    def add_movie(self, list_id: str, product_id: str, description=""):
+        """
+        Add an item to a SC list
+        :param list_id: the list id where to put the given movie/serie
+        :param product_id: the SC id of the movie/serie to add
+        :param description: A description for that item in the list
+        :return: the SC list item id used to identify the new item in the list
+        """
+        data = {
+            "list_id": list_id,
+            "subtype_id": self._SUB_TYPE_ID,
+            "product_id": product_id,
+            "description": description
+        }
+        response = requests.post(self._URL_ADD_LIST_ITEM,
+                                 headers=_HEADERS,
+                                 data=data,
+                                 cookies=self.user.session_cookies)
+        list_item_id = html.fromstring(response.content).xpath(self.XPATH_LIST_ITEM_ID_AFTER_ADD)
+        return list_item_id[0] if list_item_id else None
 
 
 class UnauthorizedException(Exception):
