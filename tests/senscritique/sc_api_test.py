@@ -33,8 +33,8 @@ class TestLoginRequest(unittest.TestCase):
         self.password = "12345"
         user = AuthSrv().dologin(email=self.login, password=self.password)
         listsrv = ListSrv(user=user)
-        list = listsrv.create_list("myTestList_"+str(datetime.datetime.now()), ListType.MOVIE)
-        self.list_id = list.compute_list_id()
+        sc_list = listsrv.create_list("myTestList_"+str(datetime.datetime.now()), ListType.MOVIE)
+        self.list_id = sc_list.compute_list_id()
 
     def tearDown(self):
         # TODO Delete list
@@ -57,5 +57,5 @@ class TestLoginRequest(unittest.TestCase):
     def test_create_list(self):
         user = AuthSrv().dologin(email=self.login, password=self.password)
         listsrv = ListSrv(user=user)
-        list = listsrv.create_list("myList_"+str(datetime.datetime.now()), ListType.MOVIE)
-        self.assertIsNotNone(list.path)
+        sc_list = listsrv.create_list("myList_"+str(datetime.datetime.now()), ListType.MOVIE)
+        self.assertIsNotNone(sc_list.path)

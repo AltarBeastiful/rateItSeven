@@ -28,7 +28,7 @@ from rateItSeven.senscritique.domain.user import User
 from synthetic import synthesize_constructor
 from synthetic import synthesize_property
 
-from rateItSeven.senscritique.domain.list import ListType, List
+from rateItSeven.senscritique.domain.sc_list import ListType, ScList
 
 _HEADERS = {
     'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
@@ -83,7 +83,7 @@ class ListSrv(ScSrv):
         :param name: The name of the list to create
         :param list_type: The type of list to create, eg Movie, Serie
         :return: the SC path to access the list, created by SC using the name and a random id
-        :rtype: List
+        :rtype: ScList
         """
         data = {
             "label": name,
@@ -92,7 +92,7 @@ class ListSrv(ScSrv):
             "is_public": 0
         }
         response = self.send_post(self._URL_ADD_LIST, headers=_HEADERS, data=data, cookies=self.user.session_cookies)
-        return List(type=list_type, name=name, path=response.headers["Location"])
+        return ScList(type=list_type, name=name, path=response.headers["Location"])
 
     def add_movie(self, list_id: str, product_id: str, description=""):
         """

@@ -34,7 +34,7 @@ class ListType(Enum):
 @synthesize_property('type', contract=ListType)
 @synthesize_property('name', contract='string')
 @synthesize_property('path', contract='string')
-class List(object):
+class ScList(object):
 
     # Defined for integration with IDE
     def __init__(self):
