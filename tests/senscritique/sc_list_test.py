@@ -19,28 +19,17 @@
 #   You should have received a copy of the GNU General Public License
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
-from enum import Enum
+import unittest
 
-from synthetic import synthesize_constructor
-from synthetic import synthesize_property
-
-
-class ListType(Enum):
-    MOVIE = "1"
-    SERIE = "4"
+from rateItSeven.senscritique.domain.sc_list import ScList, ListType
 
 
-@synthesize_constructor()
-@synthesize_property('type', contract=ListType)
-@synthesize_property('name', contract='string')
-@synthesize_property('path', contract='string')
-class List(object):
+class TestScList(unittest.TestCase):
 
-    # Defined for integration with IDE
-    def __init__(self):
-        pass
+    def test_compute_list_id(self):
+        sclist = ScList(type=ListType.MOVIE, name="A name", path="liste/a_name/1624343")
+        self.assertEqual("1624343", sclist.compute_list_id())
 
-    def compute_list_id(self):
-        #SC list path is of the form "liste/formattedName/id
-        splitted_path = self.path.split("/")
-        return splitted_path[-1]
+    def test_compute_list_id_slash_start(self):
+        sclist = ScList(type=ListType.MOVIE, name="A name", path="/liste/a_name/1624343")
+        self.assertEqual("1624343", sclist.compute_list_id())
