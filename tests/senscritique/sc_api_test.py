@@ -61,14 +61,15 @@ class TestLoginRequest(unittest.TestCase):
         sc_list = listsrv.create_list("myList_"+str(datetime.datetime.now()), ListType.MOVIE)
         self.assertIsNotNone(sc_list.path)
 
-    def test_build_list_listing_url_no_page(self):
+    def test_build_list_search_url_no_type(self):
         user = AuthSrv().dologin(email=self.login, password=self.password)
         listsrv = ListSrv(user=user)
-        url = listsrv._build_list_listing_url(username=user.username)
-        self.assertEqual("https://www.senscritique.com/invite-san/listes/all/likes", url)
+        url = listsrv._build_list_search_url()
+        self.assertEqual("https://www.senscritique.com/sc2/invite-san/listes/all/all/titre/page-1.ajax", url)
 
-    def test_build_list_listing_url_page_defined(self):
+    def test_build_list_search_url_movie(self):
         user = AuthSrv().dologin(email=self.login, password=self.password)
         listsrv = ListSrv(user=user)
-        url = listsrv._build_list_listing_url(username=user.username, page=18)
-        self.assertEqual("https://www.senscritique.com/invite-san/listes/all/likes/page-18", url)
+        url = listsrv._build_list_search_url(list_type=ListType.MOVIE)
+        self.assertEqual("https://www.senscritique.com/sc2/invite-san/listes/all/films/titre/page-1.ajax", url)
+

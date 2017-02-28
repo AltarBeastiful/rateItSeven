@@ -26,8 +26,8 @@ from synthetic import synthesize_property
 
 
 class ListType(Enum):
-    MOVIE = "1"
-    SERIE = "4"
+    MOVIE = ("1", "films")
+    SERIE = ("4", "series")
 
 
 @synthesize_constructor()

@@ -80,7 +80,7 @@ class AuthSrv(ScSrv):
 class ListSrv(ScSrv):
     _URL_ADD_LIST = "https://www.senscritique.com/lists/add.ajax"
     _URL_ADD_LIST_ITEM = "https://www.senscritique.com/items/add.ajax"
-    _URL_LIST_LISTING = "https://www.senscritique.com/%s/listes/all/likes"
+    _URL_SEARCH_LIST = "https://www.senscritique.com/sc2/%s/listes/all/%s/titre/page-%d.ajax"
     _SUB_TYPE_ID = "22"
     XPATH_LIST_ITEM_ID_AFTER_ADD = '//li[@data-rel="sc-item-delete"]/@data-sc-item-id'
 
@@ -122,11 +122,10 @@ class ListSrv(ScSrv):
         return list_item_id[0] if list_item_id else None
 
 
-    def _build_list_listing_url(self, username : str, page=1):
-        url = str(self._URL_LIST_LISTING % username)
-        if page > 1:
-            url += "/page-%d" % page
-        return url
+    def _build_list_search_url(self, page=1, list_type : ListType = None):
+        lsttype = "all" if list_type is None else list_type.value[1]
+        return str(self._URL_SEARCH_LIST % (self.user.username, lsttype, page))
+
 
 class UnauthorizedException(Exception):
     pass
