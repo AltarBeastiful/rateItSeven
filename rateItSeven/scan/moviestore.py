@@ -25,6 +25,7 @@ import os
 from rateItSeven.scan.moviescanner import MovieScanner
 from rateItSeven.scan.containers.moviestorestate import MovieStoreState
 from rateItSeven.scan.containers.movieguess import MovieGuess
+from rateItSeven.senscritique.domain.sc_list import ListType
 
 
 class MovieStore(object):
@@ -76,8 +77,8 @@ class MovieStore(object):
                 elif guess.is_episode():
                     known_episodes.add(guess)
 
-        return {"movies": self._create_store_state(scanned_movies, known_movies),
-                "episodes": self._create_store_state(scanned_episodes, known_episodes)}
+        return {ListType.MOVIE: self._create_store_state(scanned_movies, known_movies),
+                ListType.SERIE: self._create_store_state(scanned_episodes, known_episodes)}
 
     @staticmethod
     def _create_store_state(scanned_videos, known_videos):
