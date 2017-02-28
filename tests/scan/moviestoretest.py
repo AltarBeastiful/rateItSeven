@@ -24,6 +24,7 @@ import os
 import unittest
 
 from rateItSeven.scan.moviestore import MovieStore
+from rateItSeven.senscritique.domain.sc_list import ListType
 
 
 class TestMovieStore(unittest.TestCase):
@@ -44,15 +45,15 @@ class TestMovieStore(unittest.TestCase):
     def test_pullChanges_allMoviesShouldBeAdded(self):
         with MovieStore(self.storepath, [self.basedir_abspath]) as store:
             store_states = store.pull_changes()
-            self.assertEqual(2, len(store_states["movies"].added))
-            self.assertEqual(1, len(store_states["episodes"].added))
+            self.assertEqual(2, len(store_states[ListType.MOVIE].added))
+            self.assertEqual(1, len(store_states[ListType.SERIE].added))
 
     def test_pullChanges_allMoviesShouldAlreadyExist(self):
         with MovieStore(self.storepath, [self.basedir_abspath]) as store:
             store.persist_scanned_changes()
             store_states = store.pull_changes()
-            self.assertEqual(2, len(store_states["movies"].existing))
-            self.assertEqual(1, len(store_states["episodes"].existing))
+            self.assertEqual(2, len(store_states[ListType.MOVIE].existing))
+            self.assertEqual(1, len(store_states[ListType.SERIE].existing))
 
     def test_pullChanges_oneDeleted(self):
         with MovieStore(self.storepath, [self.basedir_abspath]) as store:
@@ -66,7 +67,7 @@ class TestMovieStore(unittest.TestCase):
             os.remove(movie_to_delete_path)
             store_states = store.pull_changes()
 
-            self.assertEqual(1, len(store_states["movies"].deleted))
+            self.assertEqual(1, len(store_states[ListType.MOVIE].deleted))
 
     def test_persist_multipleTimes_shouldRespectJsonFormat(self):
         with MovieStore(self.storepath, [self.basedir_abspath]) as store:
