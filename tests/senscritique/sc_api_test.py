@@ -60,3 +60,15 @@ class TestLoginRequest(unittest.TestCase):
         listsrv = ListSrv(user=user)
         sc_list = listsrv.create_list("myList_"+str(datetime.datetime.now()), ListType.MOVIE)
         self.assertIsNotNone(sc_list.path)
+
+    def test_build_list_listing_url_no_page(self):
+        user = AuthSrv().dologin(email=self.login, password=self.password)
+        listsrv = ListSrv(user=user)
+        url = listsrv._build_list_listing_url(username=user.username)
+        self.assertEqual("https://www.senscritique.com/invite-san/listes/all/likes", url)
+
+    def test_build_list_listing_url_page_defined(self):
+        user = AuthSrv().dologin(email=self.login, password=self.password)
+        listsrv = ListSrv(user=user)
+        url = listsrv._build_list_listing_url(username=user.username, page=18)
+        self.assertEqual("https://www.senscritique.com/invite-san/listes/all/likes/page-18", url)
