@@ -121,6 +121,24 @@ class ListSrv(ScSrv):
         list_item_id = html.fromstring(response.content).xpath(self.XPATH_LIST_ITEM_ID_AFTER_ADD)
         return list_item_id[0] if list_item_id else None
 
+    def find_list(self, title: str, list_type : ListType = ListType.MOVIE):
+        """
+        Look on SC for lists matching the given title in the given user lists
+        :param title: the title of the list to find
+        :param list_type: the type of list to find (Serie/Movie)
+        :return: a list of ScList matching the title
+        :rtype: list
+        """
+        page = 1
+        list_paths = True
+        lists = []
+        while list_paths:
+            url = self._build_list_search_url(page=page, list_type=list_type)
+            response = self.send_post(url=url, data={"searchQuery": title}, cookies=self.user.session_cookies)
+            list_paths = html.fromstring(response.content).xpath("//a[@class='elth-thumbnail-title']")
+            lists += [ScList(type=list_type, name=l.attrib["title"], path=l.attrib["href"]) for l in list_paths]
+            page += 1
+        return lists
 
     def _build_list_search_url(self, page=1, list_type : ListType = None):
         lsttype = "all" if list_type is None else list_type.value[1]

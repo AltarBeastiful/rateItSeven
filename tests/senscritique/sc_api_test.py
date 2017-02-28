@@ -20,6 +20,7 @@
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
 import datetime
+import time
 import unittest
 
 from rateItSeven.senscritique.sc_api import AuthSrv, ListSrv, ListType, UnauthorizedException
@@ -72,4 +73,30 @@ class TestLoginRequest(unittest.TestCase):
         listsrv = ListSrv(user=user)
         url = listsrv._build_list_search_url(list_type=ListType.MOVIE)
         self.assertEqual("https://www.senscritique.com/sc2/invite-san/listes/all/films/titre/page-1.ajax", url)
+
+    def test_find_list_find_some(self):
+        user = AuthSrv().dologin(email=self.login, password=self.password)
+        listsrv = ListSrv(user=user)
+        listsrv.create_list("find_"+str(datetime.datetime.now()), ListType.MOVIE)
+        listsrv.create_list("find_"+str(datetime.datetime.now()), ListType.MOVIE)
+        # wait 2sec so SensCritique can aknowledge newly created lists
+        time.sleep(2)
+        lists = listsrv.find_list("find_", ListType.MOVIE)
+        self.assertGreater(len(lists), 1)
+
+    def test_find_list_find_one(self):
+        user = AuthSrv().dologin(email=self.login, password=self.password)
+        listsrv = ListSrv(user=user)
+        unique_name = str(datetime.datetime.now())
+        listsrv.create_list(unique_name, ListType.MOVIE)
+        # wait 2sec so SensCritique can aknowledge newly created lists
+        time.sleep(2)
+        lists = listsrv.find_list(unique_name, ListType.MOVIE)
+        self.assertEqual(len(lists), 1)
+
+    def test_find_list_find_none(self):
+        user = AuthSrv().dologin(email=self.login, password=self.password)
+        listsrv = ListSrv(user=user)
+        lists = listsrv.find_list(str(datetime.datetime.now()), ListType.MOVIE)
+        self.assertFalse(lists)
 
