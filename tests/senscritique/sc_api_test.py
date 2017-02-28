@@ -43,6 +43,7 @@ class TestLoginRequest(unittest.TestCase):
     def test_login_success(self):
         user = AuthSrv().dologin(email=self.login, password=self.password)
         self.assertNotEqual(0, len(user.session_cookies))
+        self.assertEqual("invite-san", user.username)
 
     def test_login_failure(self):
         with self.assertRaises(UnauthorizedException) as exc_catcher:

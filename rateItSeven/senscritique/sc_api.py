@@ -51,6 +51,7 @@ class ScSrv(ABC):
 
 class AuthSrv(ScSrv):
     _URL = "https://www.senscritique.com/sc2/auth/login.json"
+    _URL_HOME = "https://www.senscritique.com/live"
 
     def dologin(self, email, password):
         """
@@ -66,7 +67,13 @@ class AuthSrv(ScSrv):
         content = json.loads(response.text)
         if not content["json"]["success"]:
             raise UnauthorizedException
-        return User(email=email, password=password, session_cookies=response.cookies)
+        username = self._find_username(cookies=response.cookies)
+        return User(email=email, password=password, session_cookies=response.cookies, username=username)
+
+    def _find_username(self, cookies):
+        response = requests.get(url=self._URL_HOME, allow_redirects=False, cookies=cookies)
+        [username] = html.fromstring(response.content).xpath("//span[@class='lahe-userMenu-username']/child::text()")
+        return username
 
 
 @synthesize_property('user', contract=User)
