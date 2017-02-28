@@ -30,17 +30,16 @@ from synthetic import synthesize_property
 
 from rateItSeven.senscritique.domain.sc_list import ListType, ScList
 
-_HEADERS = {
-    'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
-    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-    'accept-encoding': 'gzip, deflate, br',
-    'X-Requested-With': 'XMLHttpRequest'
-}
-
 
 class ScSrv(ABC):
+    _HEADERS = {
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
+        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'accept-encoding': 'gzip, deflate, br',
+        'X-Requested-With': 'XMLHttpRequest'
+    }
     def send_post(self, url, data=None, json_data=None, **kwargs):
-        response = requests.post(url, data=data, json=json_data, allow_redirects=False, **kwargs)
+        response = requests.post(url, data=data, json=json_data, headers=self._HEADERS, allow_redirects=False, **kwargs)
         if response.status_code >= 400:
             raise BadRequestException({
                 "message": "Request didn't terminate correctly",
@@ -63,7 +62,7 @@ class AuthSrv(ScSrv):
             'email': email,
             'pass': password,
         }
-        response = self.send_post(self._URL, headers=_HEADERS, data=data)
+        response = self.send_post(self._URL, data=data)
         content = json.loads(response.text)
         if not content["json"]["success"]:
             raise UnauthorizedException
@@ -99,7 +98,7 @@ class ListSrv(ScSrv):
             "is_ordered": 0,
             "is_public": 0
         }
-        response = self.send_post(self._URL_ADD_LIST, headers=_HEADERS, data=data, cookies=self.user.session_cookies)
+        response = self.send_post(self._URL_ADD_LIST, data=data, cookies=self.user.session_cookies)
         return ScList(type=list_type, name=name, path=response.headers["Location"])
 
     def add_movie(self, list_id: str, product_id: str, description=""):
@@ -116,8 +115,7 @@ class ListSrv(ScSrv):
             "product_id": product_id,
             "description": description
         }
-        response = requests.post(self._URL_ADD_LIST_ITEM,
-                                 headers=_HEADERS,
+        response = self.send_post(self._URL_ADD_LIST_ITEM,
                                  data=data,
                                  cookies=self.user.session_cookies)
         list_item_id = html.fromstring(response.content).xpath(self.XPATH_LIST_ITEM_ID_AFTER_ADD)
