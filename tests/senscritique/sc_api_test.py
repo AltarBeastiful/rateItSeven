@@ -23,7 +23,8 @@ import datetime
 import time
 import unittest
 
-from rateItSeven.senscritique.sc_api import AuthSrv, ListSrv, ListType, UnauthorizedException
+from rateItSeven.senscritique.domain.product import Product, ProductType
+from rateItSeven.senscritique.sc_api import AuthSrv, ListSrv, ListType, UnauthorizedException, ProductSrv
 
 
 class TestLoginRequest(unittest.TestCase):
@@ -99,4 +100,14 @@ class TestLoginRequest(unittest.TestCase):
         listsrv = ListSrv(user=user)
         lists = listsrv.find_list(str(datetime.datetime.now()), ListType.MOVIE)
         self.assertFalse(lists)
+
+    def test_find_product_no_filter(self):
+        products = ProductSrv().find_product("The Big")
+        expected = Product(type=ProductType.MOVIE, title="The Big Lebowski", id="454350")
+        self.assertIn(expected, products)
+
+    def test_find_product_filtering(self):
+        products = ProductSrv().find_product("The Big", ProductType.SERIE)
+        unexpected = Product(type=ProductType.MOVIE, title="The Big Lebowski", id="454350")
+        self.assertNotIn(unexpected, products)
 

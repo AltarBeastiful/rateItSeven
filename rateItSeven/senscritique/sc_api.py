@@ -20,15 +20,17 @@
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
 import json
+import re
 from abc import ABC
 
 import requests
 from lxml import html
-from rateItSeven.senscritique.domain.user import User
 from synthetic import synthesize_constructor
 from synthetic import synthesize_property
 
+from rateItSeven.senscritique.domain.product import ProductType, Product
 from rateItSeven.senscritique.domain.sc_list import ListType, ScList
+from rateItSeven.senscritique.domain.user import User
 
 
 class ScSrv(ABC):
@@ -38,6 +40,9 @@ class ScSrv(ABC):
         'accept-encoding': 'gzip, deflate, br',
         'X-Requested-With': 'XMLHttpRequest'
     }
+
+    def send_get(self, url, params=None, **kwargs):
+        return requests.get(url=url, headers=self._HEADERS, allow_redirects=False, params=params, **kwargs)
 
     def send_post(self, url, data=None, json_data=None, **kwargs):
         response = requests.post(url, data=data, json=json_data, headers=self._HEADERS, allow_redirects=False, **kwargs)
@@ -147,6 +152,23 @@ class ListSrv(AuthentifiedSrv):
     def _build_list_search_url(self, page=1, list_type: ListType = None):
         lsttype = "all" if list_type is None else list_type.value[1]
         return str(self._URL_SEARCH_LIST % (self.user.username, lsttype, page))
+
+
+
+class ProductSrv(ScSrv):
+    _URL_SEARCH = "https://www.senscritique.com/sc2/search/autocomplete.json"
+
+    def find_product(self, title: str, product_type: ProductType = None) -> list:
+        response = self.send_get(url=self._URL_SEARCH, params={"query": title})
+        content = json.loads(response.text)
+        products = [self._product_from_url(product["url"], product["originalLabel"]) for product in content["json"]]
+        if product_type is not None:
+            products = [product for product in products if product.type == product_type]
+        return products
+
+    def _product_from_url(self, url: str, title: str) -> Product:
+        m = re.search(".*senscritique\.com/(.*)/.*/(.*)", url)
+        return Product(type=ProductType(m.group(1)), title=title, id=m.group(2))
 
 
 class UnauthorizedException(Exception):
