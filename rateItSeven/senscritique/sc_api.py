@@ -57,6 +57,10 @@ class ScSrv(ABC):
 @synthesize_property('user', contract=User)
 @synthesize_constructor()
 class AuthentifiedSrv(ScSrv):
+
+    def __init__(self):
+        pass
+
     def send_post(self, url, data=None, json_data=None, **kwargs):
         return ScSrv.send_post(self, url, data=data, json_data=json_data, cookies=self.user.session_cookies, **kwargs)
 
@@ -152,7 +156,6 @@ class ListSrv(AuthentifiedSrv):
     def _build_list_search_url(self, page=1, list_type: ListType = None):
         lsttype = "all" if list_type is None else list_type.value[1]
         return str(self._URL_SEARCH_LIST % (self.user.username, lsttype, page))
-
 
 
 class ProductSrv(ScSrv):

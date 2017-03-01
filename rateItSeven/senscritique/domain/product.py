@@ -22,6 +22,7 @@
 from enum import Enum
 
 from synthetic import synthesize_constructor
+from synthetic import synthesize_equality
 from synthetic import synthesize_property
 
 
@@ -33,15 +34,14 @@ class ProductType(Enum):
 
 
 @synthesize_constructor()
+@synthesize_equality()
 @synthesize_property('type', contract=ProductType)
 @synthesize_property('title', contract=str)
 @synthesize_property('id', contract=str)
 class Product(object):
-    def __eq__(self, other):
-        return self.type == other.type and self.id == other.id
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
+    def __init__(self):
+        pass
 
     def __hash__(self):
         return hash(self.__key())
