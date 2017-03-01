@@ -25,15 +25,16 @@ import unittest
 
 from rateItSeven.senscritique.domain.product import Product, ProductType
 from rateItSeven.senscritique.sc_api import AuthService, ListService, ListType, UnauthorizedException, ProductService
+from tests.lib.test_case import RateItSevenTestCase
 
 
-class TestLoginRequest(unittest.TestCase):
+class TestLoginRequest(RateItSevenTestCase):
     LIST_NODES_XPATH = '//div[@data-rel="lists-content"]/ul/li'
 
     def setUp(self):
         self.login = "legalizme@gmail.com"
         self.password = "12345"
-        user = AuthService().do_login(email=self.login, password=self.password)
+        user = self.authentified_user()
         listsrv = ListService(user=user)
         sc_list = listsrv.create_list("myTestList_"+str(datetime.datetime.now()), ListType.MOVIE)
         self.list_id = sc_list.compute_list_id()
@@ -43,7 +44,7 @@ class TestLoginRequest(unittest.TestCase):
         pass
 
     def test_login_success(self):
-        user = AuthService().do_login(email=self.login, password=self.password)
+        user = self.authentified_user()
         self.assertNotEqual(0, len(user.session_cookies))
         self.assertEqual("invite-san", user.username)
 
@@ -52,31 +53,31 @@ class TestLoginRequest(unittest.TestCase):
             response = AuthService().do_login(u"alogin", "badpassword")
 
     def test_add_movie(self):
-        response = AuthService().do_login(email=self.login, password=self.password)
+        response = self.authentified_user()
         listsrv = ListService(response)
         response = listsrv.add_movie(self.list_id, "11267022", "Un film porno ?")
         self.assertIsNotNone(response)
 
     def test_create_list(self):
-        user = AuthService().do_login(email=self.login, password=self.password)
+        user = self.authentified_user()
         listsrv = ListService(user=user)
         sc_list = listsrv.create_list("myList_"+str(datetime.datetime.now()), ListType.MOVIE)
         self.assertIsNotNone(sc_list.path)
 
     def test_build_list_search_url_no_type(self):
-        user = AuthService().do_login(email=self.login, password=self.password)
+        user = self.authentified_user()
         listsrv = ListService(user=user)
         url = listsrv._build_list_search_url()
         self.assertEqual("https://www.senscritique.com/sc2/invite-san/listes/all/all/titre/page-1.ajax", url)
 
     def test_build_list_search_url_movie(self):
-        user = AuthService().do_login(email=self.login, password=self.password)
+        user = self.authentified_user()
         listsrv = ListService(user=user)
         url = listsrv._build_list_search_url(list_type=ListType.MOVIE)
         self.assertEqual("https://www.senscritique.com/sc2/invite-san/listes/all/films/titre/page-1.ajax", url)
 
     def test_find_list_find_some(self):
-        user = AuthService().do_login(email=self.login, password=self.password)
+        user = self.authentified_user()
         listsrv = ListService(user=user)
         listsrv.create_list("find_"+str(datetime.datetime.now()), ListType.MOVIE)
         listsrv.create_list("find_"+str(datetime.datetime.now()), ListType.MOVIE)
@@ -86,7 +87,7 @@ class TestLoginRequest(unittest.TestCase):
         self.assertGreater(len(lists), 1)
 
     def test_find_list_find_one(self):
-        user = AuthService().do_login(email=self.login, password=self.password)
+        user = self.authentified_user()
         listsrv = ListService(user=user)
         unique_name = str(datetime.datetime.now())
         listsrv.create_list(unique_name, ListType.MOVIE)
@@ -96,7 +97,7 @@ class TestLoginRequest(unittest.TestCase):
         self.assertEqual(len(lists), 1)
 
     def test_find_list_find_none(self):
-        user = AuthService().do_login(email=self.login, password=self.password)
+        user = self.authentified_user()
         listsrv = ListService(user=user)
         lists = listsrv.find_list(str(datetime.datetime.now()), ListType.MOVIE)
         self.assertFalse(lists)
@@ -110,4 +111,3 @@ class TestLoginRequest(unittest.TestCase):
         products = ProductService().find_product("The Big", ProductType.SERIE)
         unexpected = Product(type=ProductType.MOVIE, title="The Big Lebowski", id="454350")
         self.assertNotIn(unexpected, products)
-
