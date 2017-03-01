@@ -20,5 +20,7 @@ When released, use the following step to install :
 ::
 
     sudo gem install phantomjs
-    sudo pip install rateItSeven
+    virtualenv .venv
+    source ./.venv/bin/activate
+    pip install -r requirements.txt
 
