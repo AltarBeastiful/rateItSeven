@@ -38,6 +38,7 @@ class ScSrv(ABC):
         'accept-encoding': 'gzip, deflate, br',
         'X-Requested-With': 'XMLHttpRequest'
     }
+
     def send_post(self, url, data=None, json_data=None, **kwargs):
         response = requests.post(url, data=data, json=json_data, headers=self._HEADERS, allow_redirects=False, **kwargs)
         if response.status_code >= 400:
@@ -46,6 +47,13 @@ class ScSrv(ABC):
                 "response": response
             })
         return response
+
+
+@synthesize_property('user', contract=User)
+@synthesize_constructor()
+class AuthentifiedSrv(ScSrv):
+    def send_post(self, url, data=None, json_data=None, **kwargs):
+        return ScSrv.send_post(self, url, data=data, json_data=json_data, cookies=self.user.session_cookies, **kwargs)
 
 
 class AuthSrv(ScSrv):
@@ -75,9 +83,7 @@ class AuthSrv(ScSrv):
         return username
 
 
-@synthesize_property('user', contract=User)
-@synthesize_constructor()
-class ListSrv(ScSrv):
+class ListSrv(AuthentifiedSrv):
     _URL_ADD_LIST = "https://www.senscritique.com/lists/add.ajax"
     _URL_ADD_LIST_ITEM = "https://www.senscritique.com/items/add.ajax"
     _URL_SEARCH_LIST = "https://www.senscritique.com/sc2/%s/listes/all/%s/titre/page-%d.ajax"
@@ -98,7 +104,7 @@ class ListSrv(ScSrv):
             "is_ordered": 0,
             "is_public": 0
         }
-        response = self.send_post(self._URL_ADD_LIST, data=data, cookies=self.user.session_cookies)
+        response = self.send_post(self._URL_ADD_LIST, data=data)
         return ScList(type=list_type, name=name, path=response.headers["Location"])
 
     def add_movie(self, list_id: str, product_id: str, description=""):
@@ -115,13 +121,11 @@ class ListSrv(ScSrv):
             "product_id": product_id,
             "description": description
         }
-        response = self.send_post(self._URL_ADD_LIST_ITEM,
-                                 data=data,
-                                 cookies=self.user.session_cookies)
+        response = self.send_post(self._URL_ADD_LIST_ITEM, data=data)
         list_item_id = html.fromstring(response.content).xpath(self.XPATH_LIST_ITEM_ID_AFTER_ADD)
         return list_item_id[0] if list_item_id else None
 
-    def find_list(self, title: str, list_type : ListType = ListType.MOVIE):
+    def find_list(self, title: str, list_type: ListType = ListType.MOVIE):
         """
         Look on SC for lists matching the given title in the given user lists
         :param title: the title of the list to find
@@ -134,13 +138,13 @@ class ListSrv(ScSrv):
         lists = []
         while list_paths:
             url = self._build_list_search_url(page=page, list_type=list_type)
-            response = self.send_post(url=url, data={"searchQuery": title}, cookies=self.user.session_cookies)
+            response = self.send_post(url=url, data={"searchQuery": title})
             list_paths = html.fromstring(response.content).xpath("//a[@class='elth-thumbnail-title']")
             lists += [ScList(type=list_type, name=l.attrib["title"], path=l.attrib["href"]) for l in list_paths]
             page += 1
         return lists
 
-    def _build_list_search_url(self, page=1, list_type : ListType = None):
+    def _build_list_search_url(self, page=1, list_type: ListType = None):
         lsttype = "all" if list_type is None else list_type.value[1]
         return str(self._URL_SEARCH_LIST % (self.user.username, lsttype, page))
 
