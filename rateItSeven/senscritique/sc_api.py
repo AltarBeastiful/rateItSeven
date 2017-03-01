@@ -20,10 +20,10 @@
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
 import json
-import re
-from abc import ABC
 
+import re
 import requests
+from abc import ABC
 from lxml import html
 from synthetic import synthesize_constructor
 from synthetic import synthesize_property
@@ -115,6 +115,18 @@ class ListService(AuthentifiedService):
         }
         response = self.send_post(self._URL_ADD_LIST, data=data)
         return ScList(type=list_type, name=name, path=response.headers["Location"])
+
+    def delete_list(self, list):
+        """
+        Delete a list
+        :param ScList list:
+        :rtype: bool
+        """
+
+        delete_url = "https://www.senscritique.com/sc2/lists/delete/%s.json" % (list.compute_list_id())
+
+        response = self.send_post(delete_url, data={'confirm': True})
+        return response.status_code == 200
 
     def add_movie(self, list_id: str, product_id: str, description=""):
         """

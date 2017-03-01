@@ -21,9 +21,9 @@
 #
 import datetime
 import time
-import unittest
 
 from rateItSeven.senscritique.domain.product import Product, ProductType
+from rateItSeven.senscritique.domain.sc_list import ScList
 from rateItSeven.senscritique.sc_api import AuthService, ListService, ListType, UnauthorizedException, ProductService
 from tests.lib.test_case import RateItSevenTestCase
 
@@ -111,3 +111,19 @@ class TestLoginRequest(RateItSevenTestCase):
         products = ProductService().find_product("The Big", ProductType.SERIE)
         unexpected = Product(type=ProductType.MOVIE, title="The Big Lebowski", id="454350")
         self.assertNotIn(unexpected, products)
+
+    def test_delete_list(self):
+        service = ListService(user=self.authentified_user())
+        unique_name = "Tobedeleted%s" % (str(datetime.datetime.now()))
+        sc_list = service.create_list(unique_name, ListType.MOVIE)
+
+        delete_response = service.delete_list(list=sc_list)
+
+        self.assertTrue(delete_response)
+        self.assertEqual([], service.find_list(title=unique_name, list_type=ListType.MOVIE))
+
+    def test_delete_unknown_list_returns_true(self):
+        service = ListService(user=self.authentified_user())
+        sc_list = ScList(type=ListType.MOVIE, name="unknown", path="list/unknown/12345")
+
+        self.assertTrue(service.delete_list(list=sc_list))
