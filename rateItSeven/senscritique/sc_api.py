@@ -33,7 +33,7 @@ from rateItSeven.senscritique.domain.sc_list import ListType, ScList
 from rateItSeven.senscritique.domain.user import User
 
 
-class ScSrv(ABC):
+class ScRequester(ABC):
     _HEADERS = {
         'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
         'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -56,20 +56,20 @@ class ScSrv(ABC):
 
 @synthesize_property('user', contract=User)
 @synthesize_constructor()
-class AuthentifiedSrv(ScSrv):
+class AuthentifiedService(ScRequester):
 
     def __init__(self):
         pass
 
     def send_post(self, url, data=None, json_data=None, **kwargs):
-        return ScSrv.send_post(self, url, data=data, json_data=json_data, cookies=self.user.session_cookies, **kwargs)
+        return ScRequester.send_post(self, url, data=data, json_data=json_data, cookies=self.user.session_cookies, **kwargs)
 
 
-class AuthSrv(ScSrv):
+class AuthService(ScRequester):
     _URL = "https://www.senscritique.com/sc2/auth/login.json"
     _URL_HOME = "https://www.senscritique.com/live"
 
-    def dologin(self, email, password):
+    def do_login(self, email, password):
         """
         Send a login request with the given credentials
         :return: The session cookies returned by SC
@@ -92,7 +92,7 @@ class AuthSrv(ScSrv):
         return username
 
 
-class ListSrv(AuthentifiedSrv):
+class ListService(AuthentifiedService):
     _URL_ADD_LIST = "https://www.senscritique.com/lists/add.ajax"
     _URL_ADD_LIST_ITEM = "https://www.senscritique.com/items/add.ajax"
     _URL_SEARCH_LIST = "https://www.senscritique.com/sc2/%s/listes/all/%s/titre/page-%d.ajax"
@@ -158,7 +158,7 @@ class ListSrv(AuthentifiedSrv):
         return str(self._URL_SEARCH_LIST % (self.user.username, lsttype, page))
 
 
-class ProductSrv(ScSrv):
+class ProductService(ScRequester):
     _URL_SEARCH = "https://www.senscritique.com/sc2/search/autocomplete.json"
 
     def find_product(self, title: str, product_type: ProductType = None) -> list:

@@ -26,7 +26,7 @@ from rateItSeven.legacysenscritique import LegacySensCritique
 from rateItSeven.movie import Movie
 from rateItSeven.scan.moviestore import MovieStore
 from rateItSeven.senscritique.domain.sc_list import ListType
-from rateItSeven.senscritique.sc_api import AuthSrv, ListSrv
+from rateItSeven.senscritique.sc_api import AuthService, ListService
 
 
 @synthesize_property('login', contract=str)
@@ -68,8 +68,8 @@ class RateItSeven(object):
             store.persist_scanned_changes()
 
     def _start(self):
-        user = AuthSrv().dologin(email=self.login, password=self.password)
-        listsrv = ListSrv(user)
+        user = AuthService().do_login(email=self.login, password=self.password)
+        listsrv = ListService(user)
         for video_type, title in self._LISTS_LIB.items():
             [current_list] = listsrv.find_list(title=title, list_type=video_type)
             if not current_list:
