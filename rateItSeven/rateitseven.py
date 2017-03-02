@@ -35,7 +35,7 @@ from rateItSeven.senscritique.sc_api import AuthService, ListService, ProductSer
 @synthesize_property('password', contract=str)
 @synthesize_property('search_paths', contract=list)
 @synthesize_property('store_file_path', contract=str)
-@synthesize_property('legacy_mode', contract=bool, default=True)
+@synthesize_property('legacy_mode', contract=bool, default=False)
 @synthesize_constructor()
 class RateItSeven(object):
     # TODO: Lists titles should be configurable by the user
