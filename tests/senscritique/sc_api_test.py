@@ -95,12 +95,12 @@ class TestLoginRequest(RateItSevenTestCase):
 
     def test_find_product_no_filter(self):
         products = ProductService().find_product("The Big")
-        expected = Product(type=ProductType.MOVIE, title="The Big Lebowski", id="454350")
+        expected = Product(type=ProductType.MOVIE, title="The Big Lebowski (1998)", id="454350")
         self.assertIn(expected, products)
 
     def test_find_product_filtering(self):
         products = ProductService().find_product("The Big", ProductType.SERIE)
-        unexpected = Product(type=ProductType.MOVIE, title="The Big Lebowski", id="454350")
+        unexpected = Product(type=ProductType.MOVIE, title="The Big Lebowski (1998)", id="454350")
         self.assertNotIn(unexpected, products)
 
     def test_delete_list(self):
