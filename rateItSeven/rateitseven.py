@@ -19,14 +19,16 @@
 #   You should have received a copy of the GNU General Public License
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
+import logging
 from synthetic import synthesize_constructor
 from synthetic import synthesize_property
 
 from rateItSeven.legacysenscritique import LegacySensCritique
 from rateItSeven.movie import Movie
 from rateItSeven.scan.moviestore import MovieStore
+from rateItSeven.senscritique.domain.product import ProductType
 from rateItSeven.senscritique.domain.sc_list import ListType
-from rateItSeven.senscritique.sc_api import AuthService, ListService
+from rateItSeven.senscritique.sc_api import AuthService, ListService, ProductService, BadRequestException
 
 
 @synthesize_property('login', contract=str)
@@ -68,22 +70,43 @@ class RateItSeven(object):
             store.persist_scanned_changes()
 
     def _start(self):
+        # Login to SensCritique and initialize web services
         user = AuthService().do_login(email=self.login, password=self.password)
         listsrv = ListService(user)
+        productsrv = ProductService()
+
+        # Find and create if needed a list for each supported media
         for video_type, title in self._LISTS_LIB.items():
-            [current_list] = listsrv.find_list(title=title, list_type=video_type)
-            if not current_list:
-                current_list = listsrv.create_list(name=title, list_type=video_type)
+            found_lists = listsrv.find_list(title=title, list_type=video_type)
+            current_list = found_lists[0] if found_lists else listsrv.create_list(name=title, list_type=video_type)
             self._lists[video_type] = current_list
 
+        # Pull changes made in the movie store and sync them with the lists on SensCritique
         with MovieStore(self._store_file_path, self._search_paths) as store:
+
             changes = store.pull_changes()
 
             for video_type in RateItSeven._LISTS_LIB.keys():
+                product_type = ProductType.MOVIE if video_type == ListType.MOVIE else ProductType.SERIE
                 list_id = self._lists[video_type].compute_list_id()
+
+                # Media added since last check
                 for guess in changes[video_type].added:
-                    # TODO find movie/serie product_id then add it to the list (see ListSrv.add_movie)
-                    pass
+                    # Search for the product on SensCritique from his guessed title and type
+                    products = productsrv.find_product(title=guess.get("title"), product_type=product_type)
+
+                    if products:
+                        # Take the first result found by SC as it's the more likely to be the one we are looking for
+                        product = products[0]
+                        try:
+                            listsrv.add_movie(list_id=list_id, product_id=product.id)
+                            logging.info("Product '%s' added to list '%s'" % (product.title , self._lists[
+                                video_type].name))
+                        except BadRequestException:
+                            logging.error("error adding '%s' to list. Already in it ?" % product.title)
+
+                    else:
+                        logging.error("error '%s' not found on SC (%s)" % (guess.get("title"), guess.abs_path))
 
             store.persist_scanned_changes()
 
