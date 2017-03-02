@@ -176,7 +176,7 @@ class ProductService(ScRequester):
     def find_product(self, title: str, product_type: ProductType = None) -> list:
         response = self.send_get(url=self._URL_SEARCH, params={"query": title})
         content = json.loads(response.text)
-        products = [self._product_from_url(product["url"], product["originalLabel"]) for product in content["json"]]
+        products = [self._product_from_url(product["url"], product["label"]) for product in content["json"]]
         if product_type is not None:
             products = [product for product in products if product.type == product_type]
         return products
