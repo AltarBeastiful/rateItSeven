@@ -21,15 +21,17 @@
 #
 import logging
 
-from rateItSeven.legacy.legacysenscritique import LegacySensCritique
 from synthetic import synthesize_constructor
 from synthetic import synthesize_property
 
+from rateItSeven.legacy.legacysenscritique import LegacySensCritique
 from rateItSeven.legacy.movie import Movie
 from rateItSeven.scan.moviestore import MovieStore
 from rateItSeven.senscritique.domain.product import ProductType
 from rateItSeven.senscritique.domain.sc_list import ListType
-from rateItSeven.senscritique.sc_api import AuthService, ListService, ProductService, BadRequestException
+from rateItSeven.senscritique.list_service import ListService
+from rateItSeven.senscritique.product_service import ProductService
+from rateItSeven.senscritique.sc_api import AuthService, BadRequestException
 
 
 @synthesize_property('login', contract=str)

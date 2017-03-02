@@ -22,31 +22,12 @@
 import datetime
 import time
 
-from rateItSeven.senscritique.domain.product import Product, ProductType
-from rateItSeven.senscritique.domain.sc_list import ScList
-from rateItSeven.senscritique.sc_api import AuthService, ListService, ListType, UnauthorizedException, ProductService
+from rateItSeven.senscritique.domain.sc_list import ListType, ScList
+from rateItSeven.senscritique.list_service import ListService
 from tests.lib.test_case import RateItSevenTestCase
 
 
-class TestLoginRequest(RateItSevenTestCase):
-    LIST_NODES_XPATH = '//div[@data-rel="lists-content"]/ul/li'
-
-    def test_login_success(self):
-        user = self.authentified_user()
-        self.assertNotEqual(0, len(user.session_cookies))
-        self.assertEqual("invite-san", user.username)
-
-    def test_login_failure(self):
-        with self.assertRaises(UnauthorizedException) as exc_catcher:
-            response = AuthService().do_login(u"alogin", "badpassword")
-
-    def test_add_movie(self):
-        service = ListService(user=self.authentified_user())
-        sc_list = service.create_list("myList_"+str(datetime.datetime.now()), ListType.MOVIE)
-
-        response = service.add_movie(sc_list.compute_list_id(), "11267022", "Un film porno ?")
-
-        self.assertIsNotNone(response)
+class TestListService(RateItSevenTestCase):
 
     def test_create_list(self):
         user = self.authentified_user()
@@ -90,18 +71,8 @@ class TestLoginRequest(RateItSevenTestCase):
     def test_find_list_find_none(self):
         user = self.authentified_user()
         listsrv = ListService(user=user)
-        lists = listsrv.find_list(str(datetime.datetime.now()), ListType.MOVIE)
+        lists = listsrv.find_list("YoucannotFindme0987654321123", ListType.MOVIE)
         self.assertFalse(lists)
-
-    def test_find_product_no_filter(self):
-        products = ProductService().find_product("The Big")
-        expected = Product(type=ProductType.MOVIE, title="The Big Lebowski (1998)", id="454350")
-        self.assertIn(expected, products)
-
-    def test_find_product_filtering(self):
-        products = ProductService().find_product("The Big", ProductType.SERIE)
-        unexpected = Product(type=ProductType.MOVIE, title="The Big Lebowski (1998)", id="454350")
-        self.assertNotIn(unexpected, products)
 
     def test_delete_list(self):
         service = ListService(user=self.authentified_user())
