@@ -28,6 +28,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from rateItSeven.legacy.sclist import SCList
 
+@unittest.skip("Not used anymore, take too much time to pass")
 class Test(unittest.TestCase):
 
 

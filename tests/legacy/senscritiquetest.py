@@ -27,6 +27,7 @@ from rateItSeven.legacy.movie import Movie
 
 from rateItSeven.legacy.sclist import SCList, ArtType
 
+@unittest.skip("Not used anymore, take too much time to pass")
 class TestSensCritique(unittest.TestCase):
 
     def setupBadLogin(self):
