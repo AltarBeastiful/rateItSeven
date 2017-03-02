@@ -27,7 +27,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-from rateItSeven.sclist import SCList
+
+from rateItSeven.legacy.sclist import SCList
 
 DEFAULT_TIMEOUT = 5
 NEXTPAGE_TIMEOUT = 20

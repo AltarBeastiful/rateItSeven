@@ -22,12 +22,11 @@
 import unittest
 from unittest.mock import MagicMock
 
+from rateItSeven.legacy.senscritiquepages import UserPage, ListCollectionPage, HomePage, \
+    ListPage
 from selenium.webdriver.support import expected_conditions as EC
 
-from rateItSeven.sclist import SCList
-from rateItSeven.senscritiquepages import UserPage, ListCollectionPage, HomePage, \
-    ListPage
-
+from rateItSeven.legacy.sclist import SCList
 
 class Test(unittest.TestCase):
 

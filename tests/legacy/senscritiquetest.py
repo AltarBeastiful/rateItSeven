@@ -19,13 +19,13 @@
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import datetime
 import unittest
 
-from rateItSeven.legacysenscritique import LegacySensCritique
-from rateItSeven.movie import Movie
-from rateItSeven.sclist import SCList, ArtType
-import datetime
+from rateItSeven.legacy.legacysenscritique import LegacySensCritique
+from rateItSeven.legacy.movie import Movie
 
+from rateItSeven.legacy.sclist import SCList, ArtType
 
 class TestSensCritique(unittest.TestCase):
 

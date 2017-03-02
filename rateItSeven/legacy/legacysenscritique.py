@@ -20,15 +20,15 @@
 #
 
 import logging
+
+from rateItSeven.legacy.movie import Movie
+from rateItSeven.legacy.senscritiquepages import HomePage, ListCollectionPage, ListPage, \
+    ListModule
 from selenium.webdriver import PhantomJS, ActionChains
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-from rateItSeven import sclist
-from rateItSeven.movie import Movie
-from rateItSeven.senscritiquepages import HomePage, ListCollectionPage, ListPage, \
-    ListModule
-from rateItSeven.sclist import SCList
-
+from rateItSeven.legacy import sclist
+from rateItSeven.legacy.sclist import SCList
 
 LINUX_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36"
 

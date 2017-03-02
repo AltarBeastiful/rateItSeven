@@ -20,11 +20,12 @@
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
 import logging
+
+from rateItSeven.legacy.legacysenscritique import LegacySensCritique
 from synthetic import synthesize_constructor
 from synthetic import synthesize_property
 
-from rateItSeven.legacysenscritique import LegacySensCritique
-from rateItSeven.movie import Movie
+from rateItSeven.legacy.movie import Movie
 from rateItSeven.scan.moviestore import MovieStore
 from rateItSeven.senscritique.domain.product import ProductType
 from rateItSeven.senscritique.domain.sc_list import ListType
