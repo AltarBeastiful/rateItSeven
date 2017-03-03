@@ -102,7 +102,7 @@ class RateItSeven(object):
                         # Take the first result found by SC as it's the more likely to be the one we are looking for
                         product = products[0]
                         try:
-                            listsrv.add_movie(list_id=list_id, product_id=product.id)
+                            listsrv.add_movie(list_id=list_id, product_id=product.id, description=guess.abs_path)
                             logging.info("Product '%s' added to list '%s'" % (product.title , self._lists[
                                 video_type].name))
                         except BadRequestException:
