@@ -51,7 +51,7 @@ class TestListService(RateItSevenTestCase):
         listsrv = ListService(user=self.authentified_user())
 
         lists = listsrv.find_list("find_", ListType.MOVIE)
-        self.assertGreater(len(lists), 12, "Check if there is still more than 12 list with name like 'find_xxx', if not please create them again.")
+        self.assertCountGreater(lists, 12, "Check if there is still more than 12 list with name like 'find_xxx', if not please create them again.")
 
     def test_find_list_find_created_one(self):
         service = ListService(user=self.authentified_user())
@@ -61,7 +61,7 @@ class TestListService(RateItSevenTestCase):
         # wait 2sec so SensCritique can aknowledge newly created lists
         time.sleep(1)
 
-        lists = service.find_list(unique_name, ListType.MOVIE)
+        lists = list(service.find_list(unique_name, ListType.MOVIE))
         self.assertEqual(1, len(lists))
 
         # @todo Helper to create and cleanup a list?
@@ -72,7 +72,7 @@ class TestListService(RateItSevenTestCase):
         user = self.authentified_user()
         listsrv = ListService(user=user)
         lists = listsrv.find_list("YoucannotFindme0987654321123", ListType.MOVIE)
-        self.assertFalse(lists)
+        self.assertIsNone(next(lists, None))
 
     def test_delete_list(self):
         service = ListService(user=self.authentified_user())
@@ -82,7 +82,7 @@ class TestListService(RateItSevenTestCase):
         delete_response = service.delete_list(list=sc_list)
 
         self.assertTrue(delete_response)
-        self.assertEqual([], service.find_list(title=unique_name, list_type=ListType.MOVIE))
+        self.assertEqual([], list(service.find_list(title=unique_name, list_type=ListType.MOVIE)))
 
     def test_delete_unknown_list_returns_true(self):
         service = ListService(user=self.authentified_user())

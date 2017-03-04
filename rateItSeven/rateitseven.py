@@ -80,7 +80,7 @@ class RateItSeven(object):
 
         # Find and create if needed a list for each supported media
         for video_type, title in self._LISTS_LIB.items():
-            found_lists = listsrv.find_list(title=title, list_type=video_type)
+            found_lists = list(listsrv.find_list(title=title, list_type=video_type))
             current_list = found_lists[0] if found_lists else listsrv.create_list(name=title, list_type=video_type)
             self._lists[video_type] = current_list
 

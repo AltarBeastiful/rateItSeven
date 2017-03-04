@@ -85,18 +85,16 @@ class ListService(AuthentifiedService):
         :param title: the title of the list to find
         :param list_type: the type of list to find (Serie/Movie)
         :return: a list of ScList matching the title
-        :rtype: list
+        :rtype: generator
         """
         page = 1
         list_paths = True
-        lists = []
         while list_paths:
             url = self._build_list_search_url(page=page, list_type=list_type)
             response = self.send_post(url=url, data={"searchQuery": title})
             list_paths = html.fromstring(response.content).xpath("//a[@class='elth-thumbnail-title']")
-            lists += [ScList(type=list_type, name=l.attrib["title"], path=l.attrib["href"]) for l in list_paths]
+            yield from [ScList(type=list_type, name=l.attrib["title"], path=l.attrib["href"]) for l in list_paths]
             page += 1
-        return lists
 
     def _build_list_search_url(self, page=1, list_type: ListType = None):
         lsttype = "all" if list_type is None else list_type.value[1]
