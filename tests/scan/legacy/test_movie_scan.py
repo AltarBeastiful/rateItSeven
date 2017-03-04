@@ -19,16 +19,17 @@
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
 import unittest
 
-from rateItSeven.scan.moviescanner import MovieScanner
+import os
+
+from rateItSeven.scan.legacy.moviescanner import MovieScanner
 
 
 class TestMovieScan(unittest.TestCase):
 
     def setUp(self):
-        self.basedir_abspath = os.path.abspath(__file__ + "/../../resources/files_to_scan")
+        self.basedir_abspath = os.path.abspath(__file__ + "/../../../resources/files_to_scan")
         pass
 
     def test_listallMovies(self):

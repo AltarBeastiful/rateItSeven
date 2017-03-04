@@ -19,16 +19,18 @@
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
-import unittest
 import pathlib
+import unittest
 
-from rateItSeven.scan.filescanner import FileScanner
+import os
+
+from rateItSeven.scan.legacy.filescanner import FileScanner
+
 
 class TestFileScanner(unittest.TestCase):
 
     def setUp(self):
-        self.basedir_abspath = os.path.abspath(__file__ + "/../../resources/files_to_scan")
+        self.basedir_abspath = os.path.abspath(__file__ + "/../../../resources/files_to_scan")
         self.scanner = FileScanner([self.basedir_abspath])
 
         pass

@@ -20,11 +20,12 @@
 #
 
 import json
-import os
 
-from rateItSeven.scan.moviescanner import MovieScanner
-from rateItSeven.scan.containers.moviestorestate import MovieStoreState
-from rateItSeven.scan.containers.movieguess import MovieGuess
+import os
+from rateItSeven.scan.legacy.containers.moviestorestate import MovieStoreState
+from rateItSeven.scan.legacy.moviescanner import MovieScanner
+
+from rateItSeven.scan.legacy.containers.movieguess import MovieGuess
 from rateItSeven.senscritique.domain.sc_list import ListType
 
 

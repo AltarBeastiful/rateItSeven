@@ -20,9 +20,9 @@
 #
 
 import guessit
+from rateItSeven.scan.legacy.filescanner import FileScanner
 
-from rateItSeven.scan.containers.movieguess import MovieGuess
-from rateItSeven.scan.filescanner import FileScanner
+from rateItSeven.scan.legacy.containers.movieguess import MovieGuess
 
 
 class MovieScanner(object):

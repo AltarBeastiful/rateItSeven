@@ -19,19 +19,19 @@
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
 import json
-
-import os
 import unittest
 
-from rateItSeven.scan.moviestore import MovieStore
+import os
+
+from rateItSeven.scan.legacy.moviestore import MovieStore
 from rateItSeven.senscritique.domain.sc_list import ListType
 
 
 class TestMovieStore(unittest.TestCase):
     def setUp(self):
         self.basedir_abspath = os.path.abspath(
-            __file__ + "/../../resources/files_to_scan")
-        self.storepath = os.path.abspath(__file__ + "/../../resources/store")
+            __file__ + "/../../../resources/files_to_scan")
+        self.storepath = os.path.abspath(__file__ + "/../../../resources/store")
 
     def tearDown(self):
         if os.path.isfile(self.storepath):

@@ -26,7 +26,7 @@ from synthetic import synthesize_property
 
 from rateItSeven.legacy.legacysenscritique import LegacySensCritique
 from rateItSeven.legacy.movie import Movie
-from rateItSeven.scan.moviestore import MovieStore
+from rateItSeven.scan.legacy.moviestore import MovieStore
 from rateItSeven.senscritique.domain.product import ProductType
 from rateItSeven.senscritique.domain.sc_list import ListType
 from rateItSeven.senscritique.list_service import ListService
