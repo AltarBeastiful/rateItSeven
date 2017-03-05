@@ -20,13 +20,11 @@
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
 from pathlib import Path, PurePath
-from unittest import skip
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import os
-from watchdog.events import FileSystemEventHandler
 
-from rateItSeven.scan.polling_observer_with_state import PollingObserverWithState
+from rateItSeven.scan.polling_observer_with_state import PollingObserverWithState, EmptyDirectorySnapshot
 from tests.lib.test_case import RateItSevenTestCase
 from tests.lib.watchdog_helper import EmptyEventHandler, TestWatchdogObserver
 
@@ -35,15 +33,21 @@ class TestPollingObserverWithState(RateItSevenTestCase):
 
     FIXTURE_PATH = os.path.abspath(__file__ + "/../../resources/files_to_scan/")
 
-    @skip
-    def test_should_find_all_files(self, mock_add):
-        handler = MagicMock()
+    @patch.object(EmptyEventHandler, 'on_created')
+    def test_should_find_all_files_if_no_previous_state(self, mock_on_created):
+        # GIVEN
+        observer = PollingObserverWithState(timeout=0)
 
-        observer = PollingObserverWithState()
-        observer.schedule(event_handler=handler, path=self.FIXTURE_PATH, recursive=True)
-        observer.start()
+        # A polling observer watching fixture directory with an empty initial state
+        initial_state = EmptyDirectorySnapshot(path=self.FIXTURE_PATH)
+        observer.schedule(event_handler=EmptyEventHandler(), path=self.FIXTURE_PATH, initial_state=initial_state, recursive=True)
 
-        self.assertEqual(11, mock_add.call_count)
+        # Start watching directory
+        with TestWatchdogObserver(observer=observer) as observer_helper:
+            # Parse current directory
+            observer_helper.run_one_step()
+
+        self.assertEqual(14, mock_on_created.call_count)
 
     @patch.object(EmptyEventHandler, 'on_created')
     def test_should_detect_created_file(self, mock_on_created):
@@ -68,3 +72,43 @@ class TestPollingObserverWithState(RateItSevenTestCase):
         finally:
             # Clean up file
             os.remove(str(new_file_path))
+
+    @patch.object(EmptyEventHandler, 'on_created')
+    def test_should_only_detect_files_not_in_inital_state(self, mock_on_created):
+        new_file_path_list = [
+            PurePath(self.FIXTURE_PATH) / "somefile1",
+            PurePath(self.FIXTURE_PATH) / "somefile2",
+        ]
+
+        try:
+            # GIVEN
+            # An observer watching watching the directory
+            first_observer = PollingObserverWithState(timeout=0)
+            first_observer.schedule(event_handler=EmptyEventHandler(), path=self.FIXTURE_PATH, recursive=True)
+
+            with TestWatchdogObserver(observer=first_observer) as observer_helper:
+                observer_helper.run_one_step()
+
+                # Save current directory state
+                state_list = first_observer.state_list()
+                self.assertEqual(1, len(state_list))
+
+            # Create some files while no one is watching
+            for new_file_path in new_file_path_list:
+                Path(new_file_path).touch(exist_ok=False)
+
+            # WHEN
+            # A second observer is started with the previous state
+            second_observer = PollingObserverWithState(timeout=0)
+            second_observer.schedule(event_handler=EmptyEventHandler(), path=self.FIXTURE_PATH, initial_state=state_list[0], recursive=True)
+
+            with TestWatchdogObserver(observer=second_observer) as observer_helper:
+                observer_helper.run_one_step()
+
+            # THEN
+            self.assertEqual(2, mock_on_created.call_count)
+
+        finally:
+            for new_file_path in new_file_path_list:
+                os.remove(str(new_file_path))
+

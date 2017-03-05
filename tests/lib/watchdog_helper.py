@@ -55,7 +55,8 @@ class TestWatchdogObserver(object):
         self.main_emitter().queue_events(timeout=0)
 
         # Dispatch file events and wait their resolution
-        self._observer.start()
+        if not self._observer.isAlive():
+            self._observer.start()
         self._observer.event_queue.join()
 
     def main_emitter(self):
