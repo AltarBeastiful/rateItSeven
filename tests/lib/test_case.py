@@ -4,11 +4,17 @@ import unittest
 from itertools import islice
 
 from functools import lru_cache
+from tinydb import TinyDB
+from tinydb.storages import MemoryStorage
 
 from rateItSeven.senscritique.sc_api import AuthService
 
 
 class RateItSevenTestCase(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        TinyDB.DEFAULT_STORAGE = MemoryStorage
 
     # Note: Must be static to avoid cache miss due to self argument
     @staticmethod

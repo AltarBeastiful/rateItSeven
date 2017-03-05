@@ -19,23 +19,29 @@
 #   You should have received a copy of the GNU General Public License
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
-from tinydb import TinyDB
-from tinydb.storages import MemoryStorage
+from unittest.mock import patch
 
-from rateItSeven.scan.local_collection_store import LocalCollectionStore
+import guessit
+from watchdog.events import FileSystemEvent
+
 from rateItSeven.scan.piece import Piece
+from rateItSeven.scan.piece_crawler import PieceCrawler
 from tests.lib.test_case import RateItSevenTestCase
 
 
-class TestLocalCollectionStore(RateItSevenTestCase):
+class TestPieceCrawler(RateItSevenTestCase):
 
-    def test_should_list_all_saved_piece(self):
-        collection = LocalCollectionStore()
+    @patch("rateItSeven.scan.polling_observer_with_state.PollingObserverWithState")
+    def test_should_add_new_piece_to_local_collection(self, mock_polling_observer_with_state):
+        crawler = PieceCrawler(path="some/path")
 
-        piece_1 = Piece(path="some/path/1")
-        piece_2 = Piece(path="some/path/2")
+        piece_1_path = "/etc/movie/jumanji-1995.mkv"
+        piece_2_path = "/etc/movie/Dikkenek (2006).avi"
 
-        collection.add(piece=piece_1)
-        collection.add(piece=piece_2)
+        crawler.on_created(FileSystemEvent(piece_1_path))
+        crawler.on_created(FileSystemEvent(piece_2_path))
 
-        self.assertEqual([piece_1, piece_2], collection.piece_list())
+        self.assertEqual([
+            Piece(path=piece_1_path, guess=guessit.guessit(piece_1_path)),
+            Piece(path=piece_2_path, guess=guessit.guessit(piece_2_path)),
+        ], crawler.local_collection().piece_list())

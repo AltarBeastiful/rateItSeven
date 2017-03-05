@@ -19,23 +19,11 @@
 #   You should have received a copy of the GNU General Public License
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
-from tinydb import TinyDB
-from tinydb.storages import MemoryStorage
-
-from rateItSeven.scan.local_collection_store import LocalCollectionStore
-from rateItSeven.scan.piece import Piece
-from tests.lib.test_case import RateItSevenTestCase
 
 
-class TestLocalCollectionStore(RateItSevenTestCase):
+class DictObjectMixin(object):
+    def __repr__(self):
+        return self.__dict__.__repr__()
 
-    def test_should_list_all_saved_piece(self):
-        collection = LocalCollectionStore()
-
-        piece_1 = Piece(path="some/path/1")
-        piece_2 = Piece(path="some/path/2")
-
-        collection.add(piece=piece_1)
-        collection.add(piece=piece_2)
-
-        self.assertEqual([piece_1, piece_2], collection.piece_list())
+    def __str__(self):
+        return self.__dict__.__str__()

@@ -23,11 +23,14 @@ from synthetic import synthesize_constructor
 from synthetic import synthesize_equality
 from synthetic import synthesize_property
 
+from rateItSeven.lib.dict_object_mixin import DictObjectMixin
+
 
 @synthesize_constructor()
 @synthesize_equality()
 @synthesize_property('path', contract='string')
-class Piece(object):
+@synthesize_property('guess')
+class Piece(DictObjectMixin):
 
     # For IDE integration
     def __init__(self):
@@ -36,10 +39,12 @@ class Piece(object):
     def to_dict(self):
         return {
             'path': self.path,
+            'guess': self.guess,
         }
 
     @staticmethod
     def from_dict(dict_object):
         return Piece(
-            path=dict_object['path']
+            path=dict_object['path'],
+            guess=dict_object['guess'],
         )
