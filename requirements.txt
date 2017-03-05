@@ -1,3 +1,5 @@
+contracts
+tinydb
 selenium
 guessit
 lxml
