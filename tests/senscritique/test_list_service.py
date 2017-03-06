@@ -97,3 +97,22 @@ class TestListService(RateItSevenTestCase):
         response = service.add_movie(sc_list.compute_list_id(), "11267022", "Un film porno ?")
 
         self.assertIsNotNone(response)
+
+    def test_add_episode_serie_not_yet_added(self):
+        service = ListService(user=self.authentified_user())
+        sc_list = service.create_list("myList_"+str(datetime.datetime.now()), ListType.MOVIE)
+
+        response = service.add_episode(sclist=sc_list, product_id="444509", description="S04E01")
+
+        self.assertIsNotNone(response)
+
+    def test_add_episode_serie_already_added(self):
+        service = ListService(user=self.authentified_user())
+        sc_list = service.create_list("myList_"+str(datetime.datetime.now()), ListType.MOVIE)
+
+        service.add_episode(sclist=sc_list, product_id="444509", description="S04E01")
+        service.add_episode(sclist=sc_list, product_id="444509", description="S04E02")
+
+        list_item = service.find_list_item(sclist=sc_list, product_id="444509")
+        self.assertIn("S04E01",list_item[1])
+        self.assertIn("S04E02",list_item[1])

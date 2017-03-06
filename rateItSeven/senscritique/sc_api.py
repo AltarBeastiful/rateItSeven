@@ -39,6 +39,7 @@ class ScRequester(ABC):
         'accept-encoding': 'gzip, deflate, br',
         'X-Requested-With': 'XMLHttpRequest'
     }
+    _BASE_URL_SENSCRITIQUE = "https://www.senscritique.com"
 
     def send_get(self, url, params=None, **kwargs):
         return requests.get(url=url, headers=self._HEADERS, allow_redirects=False, params=params, **kwargs)

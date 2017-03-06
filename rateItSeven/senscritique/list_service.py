@@ -29,6 +29,7 @@ class ListService(AuthentifiedService):
     _URL_ADD_LIST = "https://www.senscritique.com/lists/add.ajax"
     _URL_ADD_LIST_ITEM = "https://www.senscritique.com/items/add.ajax"
     _URL_SEARCH_LIST = "https://www.senscritique.com/sc2/%s/listes/all/%s/titre/page-%d.ajax"
+    _URL_EDIT_LIST_ITEM = "https://www.senscritique.com/items/edit/%s.json"
     _SUB_TYPE_ID = "22"
     XPATH_LIST_ITEM_ID_AFTER_ADD = '//li[@data-rel="sc-item-delete"]/@data-sc-item-id'
 
@@ -78,6 +79,46 @@ class ListService(AuthentifiedService):
         response = self.send_post(self._URL_ADD_LIST_ITEM, data=data)
         list_item_id = html.fromstring(response.content).xpath(self.XPATH_LIST_ITEM_ID_AFTER_ADD)
         return list_item_id[0] if list_item_id else None
+
+
+    def add_episode(self, sclist: ScList, product_id: str, description: str):
+        """
+        Add an episode to a list
+        The serie will be added to the list if not done yet
+        The given description will just be appended to the existing description otherwise
+        :param sclist: The list where to add the episode
+        :param product_id: the product id of the serie in which add the episode
+        :param description: The description of the episode
+        :return: the list item id of the serie inside this list
+        """
+        list_item = self.find_list_item(sclist=sclist, product_id=product_id)
+
+        if list_item:
+            url = self._URL_EDIT_LIST_ITEM % list_item[0]
+            self.send_post(url=url, data={"description": list_item[1] + "\n" + description})
+            return list_item[0]
+
+        else:
+            return self.add_movie(sclist.compute_list_id(), product_id, description)
+
+    def find_list_item(self, sclist: ScList, product_id: str):
+        """
+        Find a product in a list
+        :param sclist: The list to search in
+        :param product_id: The product id to search for
+        :return: the item id and the description of the list item
+        """
+        response = self.send_get(url=self._BASE_URL_SENSCRITIQUE + sclist.path)
+
+        xpath_item_container = '//li[@data-sc-product-id="%s"]' % product_id
+        item_container =  html.fromstring(response.content).xpath(xpath_item_container)
+
+        if item_container:
+            [item_id] = item_container[0].xpath("@data-sc-item-id")
+            item_descriptions = item_container[0].xpath('//div[@id="annotation-%s"]/text()' % item_id)
+            return item_id, "".join(item_descriptions)
+        else:
+            return None
 
     def find_list(self, title: str, list_type: ListType = ListType.MOVIE):
         """
