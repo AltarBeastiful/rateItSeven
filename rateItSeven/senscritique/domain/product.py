@@ -31,6 +31,10 @@ class ProductType(Enum):
     SERIE = "serie"
     ALBUM = "album"
     BOOK = "livre"
+    VIDEO_GAME = "jeuvideo"
+    TRACK = "morceau"
+    PERSON = "contact"
+    COMIC = "bd"
 
 
 @synthesize_constructor()
