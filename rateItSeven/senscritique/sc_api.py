@@ -60,6 +60,9 @@ class AuthentifiedService(ScRequester):
     def __init__(self):
         pass
 
+    def send_get(self, url, params=None, **kwargs):
+        return ScRequester.send_get(self, url=url, params=params, cookies=self.user.session_cookies, **kwargs)
+
     def send_post(self, url, data=None, json_data=None, **kwargs):
         return ScRequester.send_post(self, url, data=data, json_data=json_data, cookies=self.user.session_cookies, **kwargs)
 
