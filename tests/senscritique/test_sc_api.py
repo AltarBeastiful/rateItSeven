@@ -39,10 +39,3 @@ class TestScApi(RateItSevenTestCase):
         with self.assertRaises(UnauthorizedException) as exc_catcher:
             response = AuthService().do_login(u"alogin", "badpassword")
 
-    def test_add_movie(self):
-        service = ListService(user=self.authentified_user())
-        sc_list = service.create_list("myList_"+str(datetime.datetime.now()), ListType.MOVIE)
-
-        response = service.add_movie(sc_list.compute_list_id(), "11267022", "Un film porno ?")
-
-        self.assertIsNotNone(response)

@@ -89,3 +89,11 @@ class TestListService(RateItSevenTestCase):
         sc_list = ScList(type=ListType.MOVIE, name="unknown", path="list/unknown/12345")
 
         self.assertTrue(service.delete_list(list=sc_list))
+
+    def test_add_movie(self):
+        service = ListService(user=self.authentified_user())
+        sc_list = service.create_list("myList_"+str(datetime.datetime.now()), ListType.MOVIE)
+
+        response = service.add_movie(sc_list.compute_list_id(), "11267022", "Un film porno ?")
+
+        self.assertIsNotNone(response)
