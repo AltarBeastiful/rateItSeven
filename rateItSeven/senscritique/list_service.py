@@ -42,7 +42,7 @@ class ListService(AuthentifiedService):
         """
         data = {
             "label": name,
-            "subtype_id_related": "1",
+            "subtype_id_related": list_type.value[0],
             "is_ordered": 0,
             "is_public": 0
         }
