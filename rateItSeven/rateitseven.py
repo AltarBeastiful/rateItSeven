@@ -102,7 +102,14 @@ class RateItSeven(object):
                         # Take the first result found by SC as it's the more likely to be the one we are looking for
                         product = products[0]
                         try:
-                            listsrv.add_movie(list_id=list_id, product_id=product.id, description=guess.abs_path)
+                            if video_type == ListType.MOVIE:
+                                listsrv.add_movie(list_id=list_id, product_id=product.id, description=guess.abs_path)
+                            else:
+                                # TODO create a real template to display episode list
+                                description = "%s : (Season %d, Episode %d)" % (guess.get("episode_title"),
+                                                                                guess.get("season"),
+                                                                                guess.get("episode"))
+                                listsrv.add_episode(self._lists[video_type],product_id=product.id, description=description)
                             logging.info("Product '%s' added to list '%s'" % (product.title , self._lists[
                                 video_type].name))
                         except BadRequestException:
