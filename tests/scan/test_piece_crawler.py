@@ -45,3 +45,6 @@ class TestPieceCrawler(RateItSevenTestCase):
             Piece(path=piece_1_path, guess=guessit.guessit(piece_1_path)),
             Piece(path=piece_2_path, guess=guessit.guessit(piece_2_path)),
         ], crawler.local_collection().piece_list())
+
+    def test_should_not_crawl_already_crawled_files(self):
+        pass

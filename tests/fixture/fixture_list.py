@@ -3,8 +3,8 @@
 
 #   === This file is part of RateItSeven ===
 #
-#   Copyright 2015, Rémi Benoit <r3m1.benoit@gmail.com>
-#   Copyright 2015, Paolo de Vathaire <paolo.devathaire@gmail.com>
+#   Copyright 2017, Rémi Benoit <r3m1.benoit@gmail.com>
+#   Copyright 2017, Paolo de Vathaire <paolo.devathaire@gmail.com>
 #
 #   RateItSeven is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -19,19 +19,14 @@
 #   You should have received a copy of the GNU General Public License
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
-from contracts import new_contract
-from requests.cookies import RequestsCookieJar
-from synthetic import synthesize_constructor
-from synthetic import synthesize_property
+from guessit import guessit
 
-new_contract("RequestsCookieJar", RequestsCookieJar)
+from rateItSeven.scan.piece import Piece
 
 
-@synthesize_constructor()
-@synthesize_property('session_cookies', contract="RequestsCookieJar|None")
-@synthesize_property('email', contract=str)
-@synthesize_property('password', contract=str)
-@synthesize_property('username', contract=str)
-class User(object):
-    def __init__(self):
-        pass
+class FixtureList(object):
+
+    piece_list = [
+        Piece(path="/etc/movies/The Big Lebowski (1998).avi", guess=guessit("/etc/movies/The Big Lebowski (1998).avi")),
+        Piece(path="/etc/movies/Gone.Girl.720p.mkv", guess=guessit("/etc/movies/Gone.Girl.720p.mkv")),
+    ]
