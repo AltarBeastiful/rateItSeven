@@ -43,7 +43,12 @@ class RemoteCollectionStore(object):
         self._list_service = ListService(user=self._user)
 
         matching_list_list = self._list_service.find_list(self.movie_collection_title, list_type=ListType.MOVIE)
-        self._movie_list = matching_list_list[0]
+
+        if not matching_list_list:
+            self._movie_list = self._list_service.create_list(name=self.movie_collection_title,
+                                                              list_type=ListType.MOVIE)
+        else:
+            self._movie_list = matching_list_list[0]
 
     @contract
     def add(self, piece):

@@ -153,6 +153,20 @@ class TestRemoteCollectionStore(RateItSevenTestCase):
     @patch.object(ProductService, 'find_product')
     @patch.object(ListService, 'add_movie')
     @patch.object(AuthService, 'do_login')
-    def test_remote_collection_creates_list_if_not_present(self, mock_do_login, mock_add_movie, mock_find_product, *mocks):
-        #@todo implement
-        pass
+    def test_remote_collection_creates_list_if_not_present(self, mock_do_login, mock_add_movie, mock_find_product, mock_create_list, *mocks):
+        mock_do_login.return_value = User(email="meme@me.com", password="1234", username="meme")
+        mock_find_product.return_value = [
+            Product(title="SomeTitle", id="12345", type=ProductType.MOVIE),
+        ]
+        mock_create_list.return_value = ScList(name="a List", path="/liste/aList/123ListId", type=ListType.MOVIE)
+
+        piece = FixtureList.piece_list[0]
+
+        # WHEN
+        remote = RemoteCollectionStore(email="meme@me.com", password="1234", movie_collection_title="A movie List")
+        result = remote.add(piece)
+
+        # THEN
+        self.assertTrue(result)
+        mock_create_list.assert_called_once_with(name="A movie List", list_type=ListType.MOVIE)
+        mock_add_movie.assert_called_once_with(list_id="123ListId", product_id="12345")
