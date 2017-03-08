@@ -31,6 +31,16 @@ class ListType(Enum):
 
 
 @synthesize_constructor()
+@synthesize_property('id', contract='string')
+@synthesize_property('list_id', contract='string')
+@synthesize_property('description', contract='string')
+class ListItem(object):
+
+    def __init__(self):
+        pass
+
+
+@synthesize_constructor()
 @synthesize_property('type', contract=ListType)
 @synthesize_property('name', contract='string')
 @synthesize_property('path', contract='string')

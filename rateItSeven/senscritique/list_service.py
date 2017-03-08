@@ -21,7 +21,7 @@
 #
 from lxml import html
 
-from rateItSeven.senscritique.domain.sc_list import ListType, ScList
+from rateItSeven.senscritique.domain.sc_list import ListType, ScList, ListItem
 from rateItSeven.senscritique.sc_api import AuthentifiedService
 
 
@@ -94,9 +94,9 @@ class ListService(AuthentifiedService):
         list_item = self.find_list_item(sclist=sclist, product_id=product_id)
 
         if list_item:
-            url = self._URL_EDIT_LIST_ITEM % list_item[0]
-            self.send_post(url=url, data={"description": list_item[1] + "\n" + description})
-            return list_item[0]
+            url = self._URL_EDIT_LIST_ITEM % list_item.id
+            self.send_post(url=url, data={"description": list_item.description + "\n" + description})
+            return list_item.id
 
         else:
             return self.add_movie(sclist.compute_list_id(), product_id, description)
@@ -106,19 +106,21 @@ class ListService(AuthentifiedService):
         Find a product in a list
         :param sclist: The list to search in
         :param product_id: The product id to search for
-        :return: the item id and the description of the list item
+        :rtype: ListItem
         """
         response = self.send_get(url=self._BASE_URL_SENSCRITIQUE + sclist.path)
 
         xpath_item_container = '//li[@data-sc-product-id="%s"]' % product_id
         item_container =  html.fromstring(response.content).xpath(xpath_item_container)
 
-        if item_container:
-            [item_id] = item_container[0].xpath("@data-sc-item-id")
-            item_descriptions = item_container[0].xpath('//div[@id="annotation-%s"]/text()' % item_id)
-            return item_id, "".join(item_descriptions)
-        else:
+        if not item_container:
             return None
+
+        [item_id] = item_container[0].xpath("@data-sc-item-id")
+        item_descriptions = item_container[0].xpath('//div[@id="annotation-%s"]/text()' % item_id)
+
+        return ListItem(id=item_id, list_id=sclist.compute_list_id(),
+                        description="".join(item_descriptions))
 
     def find_list(self, title: str, list_type: ListType = ListType.MOVIE):
         """
@@ -126,7 +128,7 @@ class ListService(AuthentifiedService):
         :param title: the title of the list to find
         :param list_type: the type of list to find (Serie/Movie)
         :return: a list of ScList matching the title
-        :rtype: generator
+        :rtype: generator(ScList)
         """
         page = 1
         list_paths = True

@@ -59,7 +59,7 @@ class TestListService(RateItSevenTestCase):
         unique_name = str(datetime.datetime.now())
         service.create_list(unique_name, ListType.MOVIE)
         # wait 2sec so SensCritique can aknowledge newly created lists
-        time.sleep(1)
+        time.sleep(2)
 
         lists = list(service.find_list(unique_name, ListType.MOVIE))
         self.assertEqual(1, len(lists))
@@ -114,5 +114,5 @@ class TestListService(RateItSevenTestCase):
         service.add_episode(sclist=sc_list, product_id="444509", description="S04E02")
 
         list_item = service.find_list_item(sclist=sc_list, product_id="444509")
-        self.assertIn("S04E01",list_item[1])
-        self.assertIn("S04E02",list_item[1])
+        self.assertIn("S04E01",list_item.description)
+        self.assertIn("S04E02",list_item.description)
