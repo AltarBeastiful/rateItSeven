@@ -21,8 +21,13 @@
 #
 from enum import Enum
 
+from contracts import new_contract, contract
 from synthetic import synthesize_constructor
 from synthetic import synthesize_property
+
+from rateItSeven.senscritique.domain.product import Product
+
+new_contract('Product', Product)
 
 
 class ListType(Enum):
@@ -34,6 +39,7 @@ class ListType(Enum):
 @synthesize_property('id', contract='string')
 @synthesize_property('list_id', contract='string')
 @synthesize_property('description', contract='string')
+@synthesize_property('product', contract='Product|None')
 class ListItem(object):
 
     def __init__(self):
@@ -54,3 +60,14 @@ class ScList(object):
         #SC list path is of the form "liste/formattedName/id
         splitted_path = self.path.split("/")
         return splitted_path[-1]
+
+    @contract
+    def page_url(self, index):
+        """
+        Return the url of the list page.
+        :type index: int
+        :rtype: string
+        """
+
+        return "/sc2/liste/{list_id}/page-{page_index}.ajax".format(list_id=self.compute_list_id(),
+                                                                    page_index=index)

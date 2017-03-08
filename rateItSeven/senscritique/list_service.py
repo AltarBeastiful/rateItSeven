@@ -111,7 +111,7 @@ class ListService(AuthentifiedService):
         response = self.send_get(url=self._BASE_URL_SENSCRITIQUE + sclist.path)
 
         xpath_item_container = '//li[@data-sc-product-id="%s"]' % product_id
-        item_container =  html.fromstring(response.content).xpath(xpath_item_container)
+        item_container = html.fromstring(response.content).xpath(xpath_item_container)
 
         if not item_container:
             return None
@@ -137,6 +137,39 @@ class ListService(AuthentifiedService):
             response = self.send_post(url=url, data={"searchQuery": title})
             list_paths = html.fromstring(response.content).xpath("//a[@class='elth-thumbnail-title']")
             yield from [ScList(type=list_type, name=l.attrib["title"], path=l.attrib["href"]) for l in list_paths]
+            page += 1
+
+    def list_item_list(self, sc_list):
+        """
+        Returns all items of the ScList
+        :type sc_list: ScList
+        :rtype: list(ListItem)
+        """
+        page = 1
+
+        while True:
+            response = self.send_get(url=self._BASE_URL_SENSCRITIQUE + sc_list.page_url(index=page))
+            html_content = html.fromstring(response.text)
+
+            item_node_list = html_content.xpath('//li[@data-rel="list-item"]')
+
+            if not item_node_list:
+                raise StopIteration()
+
+            for item_node in item_node_list:
+                item_id = item_node.get('data-sc-product-id')
+
+                # Find item description if any
+                description = ""
+                description_node_list = item_node.xpath("//div[contains(@id,'annotation')]")
+
+                if description_node_list:
+                    description = description_node_list[0].text
+
+                # @todo parse product as well
+
+                yield ListItem(id=item_id, description=description, list_id=sc_list.compute_list_id())
+
             page += 1
 
     def _build_list_search_url(self, page=1, list_type: ListType = None):

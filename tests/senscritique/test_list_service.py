@@ -116,3 +116,16 @@ class TestListService(RateItSevenTestCase):
         list_item = service.find_list_item(sclist=sc_list, product_id="444509")
         self.assertIn("S04E01",list_item.description)
         self.assertIn("S04E02",list_item.description)
+
+    def test_should_find_all_list_items(self):
+        service = ListService(user=self.authentified_user())
+        sc_list = next(service.find_list(title="DONOTCHANGE_list_with_items", list_type=ListType.MOVIE))
+
+        item_list = list(service.list_item_list(sc_list=sc_list))
+
+        # @todo uncomment when product parsing is implemented
+        # self.assertEqual(Product(id="373249", title="Izo", type=ProductType.MOVIE), item_list[0].product)
+        self.assertEqual("a description", item_list[0].description)
+
+        # We retrieved more than one page
+        self.assertCountGreater(item_list, 30)

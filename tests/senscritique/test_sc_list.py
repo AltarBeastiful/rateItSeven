@@ -33,3 +33,8 @@ class TestScList(unittest.TestCase):
     def test_compute_list_id_slash_start(self):
         sclist = ScList(type=ListType.MOVIE, name="A name", path="/liste/a_name/1624343")
         self.assertEqual("1624343", sclist.compute_list_id())
+
+    def test_should_construct_page_url(self):
+        sclist = ScList(type=ListType.MOVIE, name="A name", path="/liste/a_name/1622651")
+
+        self.assertEqual("/sc2/liste/1622651/page-1.ajax", sclist.page_url(index=1))
