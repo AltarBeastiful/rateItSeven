@@ -5,3 +5,4 @@ guessit
 lxml
 requests
 pysynthetic
+virtualenv
