@@ -23,9 +23,10 @@ from lxml import html
 
 from rateItSeven.senscritique.domain.sc_list import ListType, ScList, ListItem
 from rateItSeven.senscritique.sc_api import AuthentifiedService
+from rateItSeven.senscritique.scrapper_mixin import ScrapperMixin
 
 
-class ListService(AuthentifiedService):
+class ListService(AuthentifiedService, ScrapperMixin):
     _URL_ADD_LIST = "https://www.senscritique.com/lists/add.ajax"
     _URL_ADD_LIST_ITEM = "https://www.senscritique.com/items/add.ajax"
     _URL_SEARCH_LIST = "https://www.senscritique.com/sc2/%s/listes/all/%s/titre/page-%d.ajax"
@@ -77,7 +78,7 @@ class ListService(AuthentifiedService):
             "description": description
         }
         response = self.send_post(self._URL_ADD_LIST_ITEM, data=data)
-        list_item_id = html.fromstring(response.content).xpath(self.XPATH_LIST_ITEM_ID_AFTER_ADD)
+        list_item_id = self.parse_html(response).xpath(self.XPATH_LIST_ITEM_ID_AFTER_ADD)
         return list_item_id[0] if list_item_id else None
 
 
@@ -111,7 +112,7 @@ class ListService(AuthentifiedService):
         response = self.send_get(url=self._BASE_URL_SENSCRITIQUE + sclist.path)
 
         xpath_item_container = '//li[@data-sc-product-id="%s"]' % product_id
-        item_container = html.fromstring(response.content).xpath(xpath_item_container)
+        item_container = self.parse_html(response).xpath(xpath_item_container)
 
         if not item_container:
             return None
@@ -135,7 +136,7 @@ class ListService(AuthentifiedService):
         while list_paths:
             url = self._build_list_search_url(page=page, list_type=list_type)
             response = self.send_post(url=url, data={"searchQuery": title})
-            list_paths = html.fromstring(response.content).xpath("//a[@class='elth-thumbnail-title']")
+            list_paths = self.parse_html(response).xpath("//a[@class='elth-thumbnail-title']")
             yield from [ScList(type=list_type, name=l.attrib["title"], path=l.attrib["href"]) for l in list_paths]
             page += 1
 
