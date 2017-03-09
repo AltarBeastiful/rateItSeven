@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
 import unittest
 from itertools import islice
 
@@ -11,6 +12,7 @@ from rateItSeven.senscritique.sc_api import AuthService
 
 
 class RateItSevenTestCase(unittest.TestCase):
+    FIXTURE_FILES_PATH = os.path.abspath(__file__ + "/../../resources/files_to_scan/")
 
     @classmethod
     def setUpClass(cls):

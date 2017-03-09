@@ -31,16 +31,14 @@ from tests.lib.watchdog_helper import EmptyEventHandler, TestWatchdogObserver
 
 class TestPollingObserverWithState(RateItSevenTestCase):
 
-    FIXTURE_PATH = os.path.abspath(__file__ + "/../../resources/files_to_scan/")
-
     @patch.object(EmptyEventHandler, 'on_created')
     def test_should_find_all_files_if_no_previous_state(self, mock_on_created):
         # GIVEN
         observer = PollingObserverWithState(timeout=0)
 
         # A polling observer watching fixture directory with an empty initial state
-        initial_state = EmptyDirectorySnapshot(path=self.FIXTURE_PATH)
-        observer.schedule(event_handler=EmptyEventHandler(), path=self.FIXTURE_PATH, initial_state=initial_state, recursive=True)
+        initial_state = EmptyDirectorySnapshot(path=self.FIXTURE_FILES_PATH)
+        observer.schedule(event_handler=EmptyEventHandler(), path=self.FIXTURE_FILES_PATH, initial_state=initial_state, recursive=True)
 
         # Start watching directory
         with TestWatchdogObserver(observer=observer) as observer_helper:
@@ -51,13 +49,13 @@ class TestPollingObserverWithState(RateItSevenTestCase):
 
     @patch.object(EmptyEventHandler, 'on_created')
     def test_should_detect_created_file(self, mock_on_created):
-        new_file_path = PurePath(self.FIXTURE_PATH) / "somefile"
+        new_file_path = PurePath(self.FIXTURE_FILES_PATH) / "somefile"
         try:
 
             # GIVEN
             # A polling observer watching fixture directory
             observer = PollingObserverWithState(timeout=0)
-            observer.schedule(event_handler=EmptyEventHandler(), path=self.FIXTURE_PATH, recursive=True)
+            observer.schedule(event_handler=EmptyEventHandler(), path=self.FIXTURE_FILES_PATH, recursive=True)
 
             # Start watching directory
             with TestWatchdogObserver(observer=observer) as observer_helper:
@@ -76,15 +74,15 @@ class TestPollingObserverWithState(RateItSevenTestCase):
     @patch.object(EmptyEventHandler, 'on_created')
     def test_should_only_detect_files_not_in_inital_state(self, mock_on_created):
         new_file_path_list = [
-            PurePath(self.FIXTURE_PATH) / "somefile1",
-            PurePath(self.FIXTURE_PATH) / "somefile2",
+            PurePath(self.FIXTURE_FILES_PATH) / "somefile1",
+            PurePath(self.FIXTURE_FILES_PATH) / "somefile2",
         ]
 
         try:
             # GIVEN
             # An observer watching watching the directory
             first_observer = PollingObserverWithState(timeout=0)
-            first_observer.schedule(event_handler=EmptyEventHandler(), path=self.FIXTURE_PATH, recursive=True)
+            first_observer.schedule(event_handler=EmptyEventHandler(), path=self.FIXTURE_FILES_PATH, recursive=True)
 
             with TestWatchdogObserver(observer=first_observer) as observer_helper:
                 observer_helper.run_one_step()
@@ -100,7 +98,7 @@ class TestPollingObserverWithState(RateItSevenTestCase):
             # WHEN
             # A second observer is started with the previous state
             second_observer = PollingObserverWithState(timeout=0)
-            second_observer.schedule(event_handler=EmptyEventHandler(), path=self.FIXTURE_PATH, initial_state=state_list[0], recursive=True)
+            second_observer.schedule(event_handler=EmptyEventHandler(), path=self.FIXTURE_FILES_PATH, initial_state=state_list[0], recursive=True)
 
             with TestWatchdogObserver(observer=second_observer) as observer_helper:
                 observer_helper.run_one_step()
