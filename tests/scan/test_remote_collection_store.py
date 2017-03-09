@@ -35,7 +35,7 @@ from tests.lib.test_case import RateItSevenTestCase
 
 class TestRemoteCollectionStore(RateItSevenTestCase):
 
-    @patch.object(ListService, 'find_list', return_value=[ScList(name="a List", path="/liste/aList/aListId", type=ListType.MOVIE)])
+    @patch.object(ListService, 'find_list', return_value=iter([ScList(name="a List", path="/liste/aList/aListId", type=ListType.MOVIE)]))
     @patch.object(ProductService, 'find_product')
     @patch.object(ListService, 'add_movie')
     @patch.object(AuthService, 'do_login')
@@ -59,7 +59,7 @@ class TestRemoteCollectionStore(RateItSevenTestCase):
         self.assertTrue(mock_do_login.called)
         self.assertEqual(2, mock_add_movie.call_count)
 
-    @patch.object(ListService, 'find_list', return_value=[ScList(name="a List", path="/liste/aList/aListId", type=ListType.MOVIE)])
+    @patch.object(ListService, 'find_list', return_value=iter([ScList(name="a List", path="/liste/aList/aListId", type=ListType.MOVIE)]))
     @patch.object(ProductService, 'find_product')
     @patch.object(ListService, 'add_movie')
     @patch.object(AuthService, 'do_login')
@@ -80,7 +80,7 @@ class TestRemoteCollectionStore(RateItSevenTestCase):
         # THEN
         mock_add_movie.assert_called_once_with(list_id=mock.ANY, product_id="12345")
 
-    @patch.object(ListService, 'find_list', return_value=[ScList(name="a List", path="/liste/aList/aListId", type=ListType.MOVIE)])
+    @patch.object(ListService, 'find_list', return_value=iter([ScList(name="a List", path="/liste/aList/aListId", type=ListType.MOVIE)]))
     @patch.object(ProductService, 'find_product')
     @patch.object(ListService, 'add_movie')
     @patch.object(AuthService, 'do_login')
@@ -99,7 +99,7 @@ class TestRemoteCollectionStore(RateItSevenTestCase):
         self.assertFalse(result)
         self.assertFalse(mock_add_movie.called)
 
-    @patch.object(ListService, 'find_list', return_value=[ScList(name="a List", path="/liste/aList/aListId", type=ListType.MOVIE)])
+    @patch.object(ListService, 'find_list', return_value=iter([ScList(name="a List", path="/liste/aList/aListId", type=ListType.MOVIE)]))
     @patch.object(ProductService, 'find_product')
     @patch.object(ListService, 'add_movie')
     @patch.object(AuthService, 'do_login')
@@ -133,9 +133,9 @@ class TestRemoteCollectionStore(RateItSevenTestCase):
         mock_find_product.return_value = [
             Product(title="SomeTitle", id="12345", type=ProductType.MOVIE),
         ]
-        mock_find_list.return_value = [
+        mock_find_list.return_value = iter([
             ScList(name="a List", path="/liste/aList/aListId", type=ListType.MOVIE)
-        ]
+        ])
 
         piece = FixtureList.piece_list[0]
 
@@ -148,7 +148,7 @@ class TestRemoteCollectionStore(RateItSevenTestCase):
         self.assertTrue(mock_find_list.called)
         mock_add_movie.assert_called_once_with(list_id="aListId", product_id="12345")
 
-    @patch.object(ListService, 'find_list', return_value=[])
+    @patch.object(ListService, 'find_list', return_value=iter([]))
     @patch.object(ListService, 'create_list')
     @patch.object(ProductService, 'find_product')
     @patch.object(ListService, 'add_movie')
