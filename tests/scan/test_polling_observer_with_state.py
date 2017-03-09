@@ -47,7 +47,7 @@ class TestPollingObserverWithState(RateItSevenTestCase):
             # Parse current directory
             observer_helper.run_one_step()
 
-        self.assertEqual(14, mock_on_created.call_count)
+        self.assertEqual(13, mock_on_created.call_count)
 
     @patch.object(EmptyEventHandler, 'on_created')
     def test_should_detect_created_file(self, mock_on_created):
