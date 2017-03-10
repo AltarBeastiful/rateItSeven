@@ -119,8 +119,3 @@ class RateItSeven(object):
                         logging.error("error '%s' not found on SC (%s)" % (guess.get("title"), guess.abs_path))
 
             store.persist_scanned_changes()
-
-
-if __name__ == '__main__':
-    daemon = RateItSeven("legalizme@gmail.com", "12345")
-    daemon.start()
