@@ -93,41 +93,40 @@ class RateItSeven(object):
             self._lists[video_type] = current_list
 
         # Pull changes made in the movie store and sync them with the lists on SensCritique
-        with MovieStore(self._store_file_path, self._search_paths) as store:
+        store = MovieStore(self._store_file_path, self._search_paths)
+        changes = store.pull_changes()
 
-            changes = store.pull_changes()
+        for video_type in RateItSeven._LISTS_LIB.keys():
+            product_type = ProductType.MOVIE if video_type == ListType.MOVIE else ProductType.SERIE
+            list_id = self._lists[video_type].compute_list_id()
 
-            for video_type in RateItSeven._LISTS_LIB.keys():
-                product_type = ProductType.MOVIE if video_type == ListType.MOVIE else ProductType.SERIE
-                list_id = self._lists[video_type].compute_list_id()
+            # Media added since last check
+            for guess in changes[video_type].added:
+                # Search for the product on SensCritique from his guessed title and type
+                products = productsrv.find_product(title=guess.get("title"), product_type=product_type)
 
-                # Media added since last check
-                for guess in changes[video_type].added:
-                    # Search for the product on SensCritique from his guessed title and type
-                    products = productsrv.find_product(title=guess.get("title"), product_type=product_type)
+                if products:
+                    # Take the first result found by SC as it's the more likely to be the one we are looking for
+                    product = products[0]
+                    try:
+                        if video_type == ListType.MOVIE:
+                            listsrv.add_movie(list_id=list_id, product_id=product.id, description=guess.abs_path)
+                        else:
+                            # TODO create a real template to display episode list
+                            description = "%s : (Season %d, Episode %d)" % (guess.get("episode_title"),
+                                                                            guess.get("season"),
+                                                                            guess.get("episode"))
+                            listsrv.add_episode(self._lists[video_type],
+                                                product_id=product.id,
+                                                description=description)
 
-                    if products:
-                        # Take the first result found by SC as it's the more likely to be the one we are looking for
-                        product = products[0]
-                        try:
-                            if video_type == ListType.MOVIE:
-                                listsrv.add_movie(list_id=list_id, product_id=product.id, description=guess.abs_path)
-                            else:
-                                # TODO create a real template to display episode list
-                                description = "%s : (Season %d, Episode %d)" % (guess.get("episode_title"),
-                                                                                guess.get("season"),
-                                                                                guess.get("episode"))
-                                listsrv.add_episode(self._lists[video_type],
-                                                    product_id=product.id,
-                                                    description=description)
+                        logging.info("Product '%s' added to list '%s'"
+                                     % (product.title , self._lists[video_type].name))
 
-                            logging.info("Product '%s' added to list '%s'"
-                                         % (product.title , self._lists[video_type].name))
+                    except BadRequestException:
+                        logging.error("error adding '%s' to list. Already in it ?" % product.title)
 
-                        except BadRequestException:
-                            logging.error("error adding '%s' to list. Already in it ?" % product.title)
+                else:
+                    logging.error("error '%s' not found on SC (%s)" % (guess.get("title"), guess.abs_path))
 
-                    else:
-                        logging.error("error '%s' not found on SC (%s)" % (guess.get("title"), guess.abs_path))
-
-            store.persist_scanned_changes()
+        store.persist_scanned_changes()

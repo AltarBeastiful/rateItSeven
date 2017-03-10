@@ -37,14 +37,7 @@ class MovieStore(object):
 
     def __init__(self, store_file_path: str, movies_dirs: list):
         self.store_file_path = store_file_path
-        self.store_file = open(store_file_path, 'a')
         self.scanner = MovieScanner(movies_dirs)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, thetype, value, traceback):
-        self.store_file.close()
 
     def persist_scanned_changes(self):
         """
@@ -52,9 +45,9 @@ class MovieStore(object):
         """
         scanned_movies = list(self.scanner.list_videos_in_types(MovieStore._SUPPORTED_VIDEO_TYPES))
         # Overwrite existing content
-        self.store_file.seek(0)
-        self.store_file.write(json.dumps(scanned_movies, default=lambda o: o.__dict__))
-        self.store_file.flush()
+        with open(self.store_file_path, 'w') as store_file:
+            store_file.write(json.dumps(scanned_movies, default=lambda o: o.__dict__))
+            store_file.flush()
 
     def pull_changes(self):
         """
@@ -66,7 +59,7 @@ class MovieStore(object):
         # load stored movies if file contains data
         known_movies = set()
         known_episodes = set()
-        if os.stat(self.store_file.name).st_size > 0:
+        if os.path.exists(self.store_file_path):
             with open(self.store_file_path) as store_read:
                 storestr = store_read.read()
             dict_guesses = json.loads(storestr)

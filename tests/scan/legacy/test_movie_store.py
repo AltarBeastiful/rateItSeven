@@ -38,46 +38,46 @@ class TestMovieStore(unittest.TestCase):
             os.remove(self.storepath)
 
     def test_persist_shouldCreateFile(self):
-        with MovieStore(self.storepath, [self.basedir_abspath]) as store:
-            store.persist_scanned_changes()
-            os.path.isfile(self.storepath)
+        store =  MovieStore(self.storepath, [self.basedir_abspath])
+        store.persist_scanned_changes()
+        os.path.isfile(self.storepath)
 
     def test_pullChanges_allMoviesShouldBeAdded(self):
-        with MovieStore(self.storepath, [self.basedir_abspath]) as store:
-            store_states = store.pull_changes()
-            self.assertEqual(2, len(store_states[ListType.MOVIE].added))
-            self.assertEqual(1, len(store_states[ListType.SERIE].added))
+        store = MovieStore(self.storepath, [self.basedir_abspath])
+        store_states = store.pull_changes()
+        self.assertEqual(2, len(store_states[ListType.MOVIE].added))
+        self.assertEqual(1, len(store_states[ListType.SERIE].added))
 
     def test_pullChanges_allMoviesShouldAlreadyExist(self):
-        with MovieStore(self.storepath, [self.basedir_abspath]) as store:
-            store.persist_scanned_changes()
-            store_states = store.pull_changes()
-            self.assertEqual(2, len(store_states[ListType.MOVIE].existing))
-            self.assertEqual(1, len(store_states[ListType.SERIE].existing))
+        store = MovieStore(self.storepath, [self.basedir_abspath])
+        store.persist_scanned_changes()
+        store_states = store.pull_changes()
+        self.assertEqual(2, len(store_states[ListType.MOVIE].existing))
+        self.assertEqual(1, len(store_states[ListType.SERIE].existing))
 
     def test_pullChanges_oneDeleted(self):
-        with MovieStore(self.storepath, [self.basedir_abspath]) as store:
-            # Create a video file
-            movie_to_delete_path = self.createFakeVideoFile()
+        store = MovieStore(self.storepath, [self.basedir_abspath])
+        # Create a video file
+        movie_to_delete_path = self.createFakeVideoFile()
 
-            # Tell the store to persist changes
-            store.persist_scanned_changes()
+        # Tell the store to persist changes
+        store.persist_scanned_changes()
 
-            # Remove the file and pull the changes
-            os.remove(movie_to_delete_path)
-            store_states = store.pull_changes()
+        # Remove the file and pull the changes
+        os.remove(movie_to_delete_path)
+        store_states = store.pull_changes()
 
-            self.assertEqual(1, len(store_states[ListType.MOVIE].deleted))
+        self.assertEqual(1, len(store_states[ListType.MOVIE].deleted))
 
     def test_persist_multipleTimes_shouldRespectJsonFormat(self):
-        with MovieStore(self.storepath, [self.basedir_abspath]) as store:
-            store.persist_scanned_changes()
-            store.persist_scanned_changes()
-            try:
-                json.load(open(self.storepath, "r"))
-                pass
-            except ValueError as e:
-                self.fail("Store file badly formatted")
+        store = MovieStore(self.storepath, [self.basedir_abspath])
+        store.persist_scanned_changes()
+        store.persist_scanned_changes()
+        try:
+            json.load(open(self.storepath, "r"))
+            pass
+        except ValueError as e:
+            self.fail("Store file badly formatted")
 
     def createFakeVideoFile(self):
         movie_to_delete_path = self.basedir_abspath + "/movieToDelete.avi"
