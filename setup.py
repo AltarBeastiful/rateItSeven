@@ -31,4 +31,8 @@ setup(name=APP_NAME,
               'rateItSeven = rateItSeven.__main__:main'
           ]
       },
+      license='GPL version 3',
+      author='Rémi Benoit, Paolo de Vathaire',
+      url='https://github.com/AltarBeastiful/rateItSeven',
+      keywords=['SensCritique', 'Sens Critique', 'library', 'media' , 'movie', 'serie', 'film']
       )
