@@ -22,9 +22,10 @@
 """
 Options
 """
-import os
 import shlex
 from argparse import ArgumentParser
+
+from rateItSeven.conf.global_settings import APP_DATA_DIR
 
 
 def build_argument_parser():
@@ -43,9 +44,9 @@ def build_argument_parser():
     opts.add_argument('-p', '--password', dest='password', default=None,
                              help='Your SensCritique password')
 
-    opts.add_argument('-f', '--storefile', dest='store_file', default=os.path.expanduser("~")
-                                                                             + "/.rateItSeven/store",
-                             help='Specify a specific store file previously created by another run of RateItSeven')
+    opts.add_argument('-f', '--storefile', dest='store_file', default=APP_DATA_DIR + "/store",
+                             help='Specify a specific store file previously created by another run of RateItSeven or '
+                                  'a path to a nonexistant file that will be created by RateItSeven')
 
     opts.add_argument('-m', '--movielist', dest='movie_list', default='RateItSeven Films',
                              help='The name of the SensCritique list where to store your movie library')

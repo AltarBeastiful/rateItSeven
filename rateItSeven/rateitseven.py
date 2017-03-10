@@ -20,10 +20,12 @@
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
 import logging
+import os
 
 from synthetic import synthesize_constructor
 from synthetic import synthesize_property
 
+from rateItSeven.conf.global_settings import APP_DATA_DIR
 from rateItSeven.legacy.legacysenscritique import LegacySensCritique
 from rateItSeven.legacy.movie import Movie
 from rateItSeven.scan.legacy.moviestore import MovieStore
@@ -49,10 +51,16 @@ class RateItSeven(object):
         self._lists = {}
 
     def start(self):
+        self.init()
         if self._legacy_mode:
             self._start_legacy()
         else:
             self._start()
+
+    def init(self):
+        # Create user data folder
+        if not os.path.exists(APP_DATA_DIR):
+            os.makedirs(APP_DATA_DIR)
 
     def _start_legacy(self):
         sc = LegacySensCritique(self.login, self.password)
