@@ -19,16 +19,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
-from setuptools import setup, find_packages
-from rateItSeven import __version__
-from rateItSeven.conf.global_settings import APP_NAME
+import appdirs
 
-setup(name=APP_NAME,
-      version=__version__.__version__,
-      packages=find_packages(),
-      entry_points={
-          'console_scripts': [
-              'rateItSeven = rateItSeven.__main__:main'
-          ]
-      },
-      )
+APP_NAME = 'RateItSeven'
+APP_DATA_DIR = appdirs.user_data_dir(appname=APP_NAME)
