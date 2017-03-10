@@ -29,10 +29,11 @@ from watchdog.events import FileSystemEventHandler, FileSystemEvent
 
 from rateItSeven.scan.local_collection_store import LocalCollectionStore
 from rateItSeven.scan.piece import Piece
-from rateItSeven.scan.polling_observer_with_state import PollingObserverWithState
+from rateItSeven.scan.polling_observer_with_state import PollingObserverWithState, EmptyDirectorySnapshot
 
 new_contract('FileSystemEvent', FileSystemEvent)
 new_contract('LocalCollectionStore', LocalCollectionStore)
+new_contract('PollingObserverWithState', PollingObserverWithState)
 
 
 @synthesize_constructor()
@@ -46,7 +47,8 @@ class PieceCrawler(FileSystemEventHandler):
 
     def __init__(self):
         self._observer = PollingObserverWithState(timeout=self.DEFAULT_CRAWL_TIMEOUT)
-        self._observer.schedule(event_handler=self, path=self.path, recursive=True)
+        self._observer.schedule(event_handler=self, path=self.path, recursive=True,
+                                initial_state=EmptyDirectorySnapshot(path=self.path))
 
         self._local_collection = LocalCollectionStore()
 
@@ -56,9 +58,12 @@ class PieceCrawler(FileSystemEventHandler):
         :param FileSystemEvent event:
         :rtype: None
         """
+        if event.is_directory:
+            return
 
-        # @todo filter piece that don't look like a movie or tv show
         piece = Piece(path=event.src_path, guess=guessit.guessit(event.src_path))
+        if not piece.is_movie():
+            return
 
         self.local_collection().add(piece)
         # @todo Store also in RemoteCollectionStore (SC based)
@@ -70,3 +75,10 @@ class PieceCrawler(FileSystemEventHandler):
         """
 
         return self._local_collection
+
+    @contract
+    def file_observer(self):
+        """
+        :rtype: PollingObserverWithState
+        """
+        return self._observer

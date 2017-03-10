@@ -36,6 +36,12 @@ class Piece(DictObjectMixin):
     def __init__(self):
         pass
 
+    def is_movie(self):
+        mime_type = self.guess.get('mimetype', "")
+        piece_type = self.guess.get('type', "")
+
+        return "video" in mime_type and "movie" in piece_type
+
     def to_dict(self):
         return {
             'path': self.path,
