@@ -98,7 +98,7 @@ class TestPollingObserverWithState(RateItSevenTestCase):
             # WHEN
             # A second observer is started with the previous state
             second_observer = PollingObserverWithState(timeout=0)
-            second_observer.schedule(event_handler=EmptyEventHandler(), path=self.FIXTURE_FILES_PATH, initial_state=state_list[0], recursive=True)
+            second_observer.schedule(event_handler=EmptyEventHandler(), path=self.FIXTURE_FILES_PATH, initial_state=state_list[0].snapshot, recursive=True)
 
             with TestWatchdogObserver(observer=second_observer) as observer_helper:
                 observer_helper.run_one_step()
@@ -110,3 +110,26 @@ class TestPollingObserverWithState(RateItSevenTestCase):
             for new_file_path in new_file_path_list:
                 os.remove(str(new_file_path))
 
+    def test_state_list_should_be_empty_if_no_watched_directories(self):
+        observer = PollingObserverWithState()
+
+        self.assertEqual([], observer.state_list())
+
+    def test_state_list_should_be_empty_before_start(self):
+        observer = PollingObserverWithState()
+        observer.schedule(event_handler=EmptyEventHandler(), path="path/1/")
+
+        self.assertEqual([], observer.state_list())
+
+    def test_should_list_state_of_watched_directories(self):
+        observer = PollingObserverWithState()
+        observer.schedule(event_handler=EmptyEventHandler(), path=self.FIXTURE_FILES_PATH)
+
+        with TestWatchdogObserver(observer=observer) as observer_helper:
+            observer_helper.run_one_step()
+
+            state_list = observer.state_list()
+
+        self.assertEqual(1, len(state_list))
+        self.assertEqual(self.FIXTURE_FILES_PATH, state_list[0].path)
+        self.assertIsNotNone(state_list[0].snapshot)

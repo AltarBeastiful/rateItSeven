@@ -20,6 +20,9 @@
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
 import os
+from contracts import contract, new_contract
+from synthetic import synthesize_constructor
+from synthetic import synthesize_property
 
 from watchdog.utils import stat as default_stat
 from watchdog.observers.api import BaseObserver, DEFAULT_OBSERVER_TIMEOUT, DEFAULT_EMITTER_TIMEOUT, ObservedWatch
@@ -53,6 +56,21 @@ class PollingEmitterWithState(PollingEmitter):
 
     def current_snapshot(self):
         return self._snapshot
+
+
+new_contract('DirectorySnapshot', DirectorySnapshot)
+
+
+@synthesize_constructor()
+@synthesize_property('path', contract='string')
+@synthesize_property('snapshot', contract='DirectorySnapshot')
+class WatchState(object):
+
+    def __init__(self):
+        pass
+
+
+new_contract('WatchState', WatchState)
 
 
 class PollingObserverWithState(BaseObserver):
@@ -113,13 +131,16 @@ class PollingObserverWithState(BaseObserver):
             self._watches.add(watch)
         return watch
 
+    @contract
     def state_list(self):
         """
         Saves the states of all watches
-        :return: list(DirectorySnapshot)
+        :rtype: list(WatchState)
         """
         state_list = []
         for emitter in self.emitters:
-            state_list.append(emitter.current_snapshot())
+            if emitter.current_snapshot() is not None:
+                state_list.append(WatchState(path=emitter.watch.path,
+                                             snapshot=emitter.current_snapshot()))
 
         return state_list
