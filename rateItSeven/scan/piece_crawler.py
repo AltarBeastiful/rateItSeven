@@ -38,6 +38,7 @@ new_contract('PollingObserverWithState', PollingObserverWithState)
 
 @synthesize_constructor()
 @synthesize_property('path', contract='string')
+@synthesize_property('local_collection_path', contract='string', default="movie_collection.json")
 class PieceCrawler(FileSystemEventHandler):
     """
     Crawls your files, find your gems (movie or tv show) and add them to
@@ -49,8 +50,7 @@ class PieceCrawler(FileSystemEventHandler):
         self._observer = PollingObserverWithState(timeout=self.DEFAULT_CRAWL_TIMEOUT)
         self._observer.schedule(event_handler=self, path=self.path, recursive=True,
                                 initial_state=EmptyDirectorySnapshot(path=self.path))
-
-        self._local_collection = LocalCollectionStore()
+        self._local_collection = LocalCollectionStore(path=self.local_collection_path)
 
     @contract
     def on_created(self, event):

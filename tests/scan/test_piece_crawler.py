@@ -19,12 +19,16 @@
 #   You should have received a copy of the GNU General Public License
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
-import os
+from unittest import skip
 from unittest.mock import patch
 
 import guessit
+import os
+from tinydb import JSONStorage
+from tinydb import TinyDB
 from watchdog.events import FileSystemEvent
 
+from rateItSeven.scan.local_collection_store import LocalCollectionStore
 from rateItSeven.scan.piece import Piece
 from rateItSeven.scan.piece_crawler import PieceCrawler
 from rateItSeven.scan.polling_observer_with_state import EmptyDirectorySnapshot, PollingObserverWithState
@@ -33,6 +37,13 @@ from tests.lib.watchdog_helper import TestWatchdogObserver
 
 
 class TestPieceCrawler(RateItSevenTestCase):
+    LOCAL_COLLECTION_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "my_collection.json")
+
+    def tearDown(self):
+        try:
+            os.remove(self.LOCAL_COLLECTION_PATH)
+        except:
+            pass
 
     @patch.object(PollingObserverWithState, 'schedule')
     @patch.object(PollingObserverWithState, '__init__', return_value=None)
@@ -84,6 +95,23 @@ class TestPieceCrawler(RateItSevenTestCase):
             observer_helper.run_one_step()
 
         self.assertNotIn(subdir_directory_path, [piece.path for piece in crawler.local_collection().piece_list()])
+
+    def test_should_save_local_collection_to_specified_path(self):
+        # Turning on file storage as we need to persist local collection
+        TinyDB.DEFAULT_STORAGE = JSONStorage
+
+        # A crawler saving collection to a local file
+        crawler = PieceCrawler(path=self.FIXTURE_FILES_PATH, local_collection_path=self.LOCAL_COLLECTION_PATH)
+
+        self.assertEqual([], crawler.local_collection().piece_list(), "Local collection should be empty first")
+
+        # WHEN
+        with TestWatchdogObserver(observer=crawler.file_observer()) as observer_helper:
+            observer_helper.run_one_step()
+
+        # THEN
+        actual_collection = LocalCollectionStore(path=self.LOCAL_COLLECTION_PATH)
+        self.assertGreater(len(actual_collection.piece_list()), 0)
 
     def test_should_not_crawl_already_crawled_files(self):
         pass

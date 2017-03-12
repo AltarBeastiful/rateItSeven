@@ -19,6 +19,8 @@
 #   You should have received a copy of the GNU General Public License
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
+from synthetic import synthesize_constructor
+from synthetic import synthesize_property
 from tinydb import JSONStorage
 from tinydb import TinyDB, Query
 from contracts import new_contract
@@ -28,12 +30,13 @@ from rateItSeven.scan.piece import Piece
 new_contract('Piece', Piece)
 
 
+@synthesize_constructor()
+@synthesize_property('path', contract='string')
 class LocalCollectionStore(object):
-    LOCAL_DB_PATH = "mydb.json"
 
     def __init__(self):
         if TinyDB.DEFAULT_STORAGE == JSONStorage:
-            self._db = TinyDB(path=self.LOCAL_DB_PATH)
+            self._db = TinyDB(path=self.path)
         else:
             self._db = TinyDB()
 

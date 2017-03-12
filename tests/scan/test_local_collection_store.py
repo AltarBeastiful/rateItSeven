@@ -30,7 +30,7 @@ from tests.lib.test_case import RateItSevenTestCase
 class TestLocalCollectionStore(RateItSevenTestCase):
 
     def test_should_list_all_saved_piece(self):
-        collection = LocalCollectionStore()
+        collection = LocalCollectionStore(path="")
 
         piece_1 = Piece(path="some/path/1")
         piece_2 = Piece(path="some/path/2")
