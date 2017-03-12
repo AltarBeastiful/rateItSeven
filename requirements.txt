@@ -1,3 +1,4 @@
+jsonpickle
 appdirs
 contracts
 tinydb

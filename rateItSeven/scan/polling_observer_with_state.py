@@ -22,12 +22,15 @@
 import os
 from contracts import contract, new_contract
 from synthetic import synthesize_constructor
+from synthetic import synthesize_equality
 from synthetic import synthesize_property
 
 from watchdog.utils import stat as default_stat
 from watchdog.observers.api import BaseObserver, DEFAULT_OBSERVER_TIMEOUT, DEFAULT_EMITTER_TIMEOUT, ObservedWatch
 from watchdog.observers.polling import PollingEmitter
 from watchdog.utils.dirsnapshot import DirectorySnapshot
+
+from rateItSeven.lib.dict_object_mixin import DictObjectMixin
 
 
 class EmptyDirectorySnapshot(DirectorySnapshot):
@@ -62,12 +65,26 @@ new_contract('DirectorySnapshot', DirectorySnapshot)
 
 
 @synthesize_constructor()
+@synthesize_equality()
 @synthesize_property('path', contract='string')
 @synthesize_property('snapshot', contract='DirectorySnapshot')
-class WatchState(object):
+class WatchState(DictObjectMixin):
 
     def __init__(self):
         pass
+
+    def to_dict(self):
+        return {
+            'path': self.path,
+            'snapshot': self.snapshot,
+        }
+
+    @staticmethod
+    def from_dict(dict_object):
+        return WatchState(
+            path=dict_object['path'],
+            snapshot=dict_object['snapshot'],
+        )
 
 
 new_contract('WatchState', WatchState)

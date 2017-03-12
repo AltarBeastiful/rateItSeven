@@ -34,7 +34,7 @@ from tests.lib.watchdog_helper import EmptyEventHandler, TestWatchdogObserver
 class TestPollingObserverWithState(RateItSevenTestCase):
 
     @patch.object(EmptyEventHandler, 'on_created')
-    def test_should_find_all_files_if_no_previous_state(self, mock_on_created):
+    def test_should_find_all_files_if_initial_state_is_empty(self, mock_on_created):
         # GIVEN
         observer = PollingObserverWithState(timeout=0)
 
