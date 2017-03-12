@@ -39,14 +39,12 @@ from tests.lib.watchdog_helper import TestWatchdogObserver
 class TestPieceCrawler(RateItSevenTestCase):
     LOCAL_COLLECTION_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "my_collection.json")
 
-    def tearDown(self):
-        try:
-            os.remove(self.LOCAL_COLLECTION_PATH)
-        except:
-            pass
+    def setUp(self):
+        self._clean_local_collection()
 
     @patch.object(PollingObserverWithState, 'schedule')
     @patch.object(PollingObserverWithState, '__init__', return_value=None)
+    @patch.object(PollingObserverWithState, 'state_list', return_value=[])
     @patch.object(EmptyDirectorySnapshot, '__init__', return_value=None)
     def test_should_add_new_piece_to_local_collection(self, *mocks):
         crawler = PieceCrawler(path="some/path")
@@ -104,6 +102,7 @@ class TestPieceCrawler(RateItSevenTestCase):
         crawler = PieceCrawler(path=self.FIXTURE_FILES_PATH, local_collection_path=self.LOCAL_COLLECTION_PATH)
 
         self.assertEqual([], crawler.local_collection().piece_list(), "Local collection should be empty first")
+        self.assertEqual([], crawler.local_collection().state_list(), "Local collection should be empty first")
 
         # WHEN
         with TestWatchdogObserver(observer=crawler.file_observer()) as observer_helper:
@@ -114,4 +113,37 @@ class TestPieceCrawler(RateItSevenTestCase):
         self.assertGreater(len(actual_collection.piece_list()), 0)
 
     def test_should_not_crawl_already_crawled_files(self):
-        pass
+        # Turning on file storage as we need to persist local collection
+        TinyDB.DEFAULT_STORAGE = JSONStorage
+
+        # A crawler saving collection to a local file
+        crawler = PieceCrawler(path=self.FIXTURE_FILES_PATH, local_collection_path=self.LOCAL_COLLECTION_PATH)
+
+        self.assertEqual([], crawler.local_collection().piece_list(), "Local collection should be empty first")
+
+        # Crawl files one time, saving local collection state
+        with TestWatchdogObserver(observer=crawler.file_observer()) as observer_helper:
+            observer_helper.run_one_step()
+
+        with patch.object(PieceCrawler, 'on_created') as mock_on_created:
+            # Crawl again same directory
+            # Using local collection previously created
+            crawler = PieceCrawler(path=self.FIXTURE_FILES_PATH, local_collection_path=self.LOCAL_COLLECTION_PATH)
+
+            # Crawl files one time, saving local collection state
+            with TestWatchdogObserver(observer=crawler.file_observer()) as observer_helper:
+                observer_helper.run_one_step()
+
+            self.assertFalse(mock_on_created.called)
+
+    def _is_local_collection_empty(self):
+        local_collection = LocalCollectionStore(self.LOCAL_COLLECTION_PATH)
+
+        return local_collection.piece_list() == [] and local_collection.state_list == []
+
+    def _clean_local_collection(self):
+        try:
+            if not self._is_local_collection_empty():
+                os.remove(self.LOCAL_COLLECTION_PATH)
+        except:
+            pass

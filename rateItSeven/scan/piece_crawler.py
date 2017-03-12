@@ -47,10 +47,13 @@ class PieceCrawler(FileSystemEventHandler):
     DEFAULT_CRAWL_TIMEOUT = timedelta(minutes=1).total_seconds()
 
     def __init__(self):
+        self._local_collection = LocalCollectionStore(path=self.local_collection_path)
+        state_by_path = self._state_by_path()
+        initial_state = state_by_path.get(self.path) or EmptyDirectorySnapshot(path=self.path)
+
         self._observer = PollingObserverWithState(timeout=self.DEFAULT_CRAWL_TIMEOUT)
         self._observer.schedule(event_handler=self, path=self.path, recursive=True,
-                                initial_state=EmptyDirectorySnapshot(path=self.path))
-        self._local_collection = LocalCollectionStore(path=self.local_collection_path)
+                                initial_state=initial_state)
 
     @contract
     def on_created(self, event):
@@ -68,6 +71,9 @@ class PieceCrawler(FileSystemEventHandler):
         self.local_collection().add(piece)
         # @todo Store also in RemoteCollectionStore (SC based)
 
+        #@todo save state_list to local collection here? What about concurrency?
+        self.local_collection().set_state_list(self._observer.state_list())
+
     @contract
     def local_collection(self):
         """
@@ -82,3 +88,6 @@ class PieceCrawler(FileSystemEventHandler):
         :rtype: PollingObserverWithState
         """
         return self._observer
+
+    def _state_by_path(self):
+        return {state.path: state.snapshot for state in self.local_collection().state_list()}
