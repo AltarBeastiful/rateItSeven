@@ -23,6 +23,8 @@ from pathlib import Path, PurePath
 from unittest.mock import patch
 
 import os
+from watchdog.utils.dirsnapshot import DirectorySnapshot
+from watchdog.utils import stat as default_stat
 
 from rateItSeven.scan.polling_observer_with_state import PollingObserverWithState, EmptyDirectorySnapshot
 from tests.lib.test_case import RateItSevenTestCase
@@ -133,3 +135,35 @@ class TestPollingObserverWithState(RateItSevenTestCase):
         self.assertEqual(1, len(state_list))
         self.assertEqual(self.FIXTURE_FILES_PATH, state_list[0].path)
         self.assertIsNotNone(state_list[0].snapshot)
+
+    def test_equal_snapshot(self):
+        def snapshot(path, is_recursive=True):
+            return DirectorySnapshot(path, is_recursive, stat=default_stat, listdir=os.listdir)
+
+        # Snapshot of same directory are equal
+        self.assertEqualSnapshot(snapshot(self.FIXTURE_FILES_PATH), snapshot(self.FIXTURE_FILES_PATH))
+        # Empty snapshot of same directory are equal
+        self.assertEqualSnapshot(EmptyDirectorySnapshot(self.FIXTURE_FILES_PATH), EmptyDirectorySnapshot(self.FIXTURE_FILES_PATH))
+
+        # Empty snapshot of different directories
+        with self.assertRaises(AssertionError):
+            self.assertEqualSnapshot(EmptyDirectorySnapshot("/etc"), EmptyDirectorySnapshot("/usr"))
+
+        # Snapshot and empty snapshot of same directory differs
+        with self.assertRaises(AssertionError):
+            self.assertEqualSnapshot(snapshot(self.FIXTURE_FILES_PATH), EmptyDirectorySnapshot(self.FIXTURE_FILES_PATH))
+
+        # Recursive and non recursive of same directory differs
+        with self.assertRaises(AssertionError):
+            self.assertEqualSnapshot(snapshot(self.FIXTURE_FILES_PATH, is_recursive=True),
+                                     snapshot(self.FIXTURE_FILES_PATH, is_recursive=False))
+
+        # top level and subdirectory differs
+        with self.assertRaises(AssertionError):
+            self.assertEqualSnapshot(snapshot(self.FIXTURE_FILES_PATH),
+                                     snapshot(os.path.join(self.FIXTURE_FILES_PATH, "subdir")))
+
+        # Totally different directories differs
+        with self.assertRaises(AssertionError):
+            self.assertEqualSnapshot(snapshot(os.path.join(self.FIXTURE_FILES_PATH, "subdir")),
+                                     snapshot(os.path.join(self.FIXTURE_FILES_PATH, "Archer Season 5  (1080p H265 Joy)")))

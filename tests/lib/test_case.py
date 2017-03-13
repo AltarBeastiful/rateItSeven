@@ -30,3 +30,12 @@ class RateItSevenTestCase(unittest.TestCase):
         """
         first_n_element = list(islice(iterable, 0, minimum + 1))
         self.assertGreater(len(first_n_element), minimum, msg)
+
+    def assertEqualSnapshot(self, snapshot_a, snapshot_b):
+        self.assertEqual(snapshot_a.paths, snapshot_b.paths)
+
+        diff = snapshot_a - snapshot_b
+        self.assertEqual([], diff.files_created)
+        self.assertEqual([], diff.files_deleted)
+        self.assertEqual([], diff.files_moved)
+        self.assertEqual([], diff.files_modified)
