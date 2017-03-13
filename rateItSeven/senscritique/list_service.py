@@ -21,9 +21,11 @@
 #
 from lxml import html
 
+from rateItSeven.senscritique.domain.product import Product
 from rateItSeven.senscritique.domain.sc_list import ListType, ScList, ListItem
 from rateItSeven.senscritique.sc_api import AuthentifiedService
 from rateItSeven.senscritique.scrapper_mixin import ScrapperMixin
+from rateItSeven.senscritique.product_service import product_from_url
 
 
 class ListService(AuthentifiedService, ScrapperMixin):
@@ -167,9 +169,11 @@ class ListService(AuthentifiedService, ScrapperMixin):
                 if description_node_list:
                     description = description_node_list[0].text
 
-                # @todo parse product as well
+                # Parse product info
+                product_a = item_node.xpath("//a[@id='product-title-%s']" % item_id)
+                product = product_from_url(product_a[0].attrib['href'], product_a[0].text) if product_a else None
 
-                yield ListItem(id=item_id, description=description, list_id=sc_list.compute_list_id())
+                yield ListItem(id=item_id, description=description, list_id=sc_list.compute_list_id(), product=product)
 
             page += 1
 

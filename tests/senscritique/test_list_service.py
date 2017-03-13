@@ -22,6 +22,7 @@
 import datetime
 import time
 
+from rateItSeven.senscritique.domain.product import ProductType, Product
 from rateItSeven.senscritique.domain.sc_list import ListType, ScList
 from rateItSeven.senscritique.list_service import ListService
 from tests.lib.test_case import RateItSevenTestCase
@@ -123,8 +124,7 @@ class TestListService(RateItSevenTestCase):
 
         item_list = list(service.list_item_list(sc_list=sc_list))
 
-        # @todo uncomment when product parsing is implemented
-        # self.assertEqual(Product(id="373249", title="Izo", type=ProductType.MOVIE), item_list[0].product)
+        self.assertEqual(Product(id="373249", title="Izo", type=ProductType.MOVIE), item_list[0].product)
         self.assertEqual("a description", item_list[0].description)
 
         # We retrieved more than one page
