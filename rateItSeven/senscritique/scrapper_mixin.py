@@ -23,7 +23,6 @@ import logging
 
 from contracts import contract, new_contract
 from lxml import html
-from lxml.etree import XMLSyntaxError
 from lxml.html import HtmlElement
 from requests import Response
 
@@ -42,7 +41,7 @@ class ScrapperMixin(object):
 
         try:
             return html.fromstring(response.text)
-        except XMLSyntaxError as e:
+        except Exception as e:
             logging.error(e)
             logging.error(response.text)
             raise e
