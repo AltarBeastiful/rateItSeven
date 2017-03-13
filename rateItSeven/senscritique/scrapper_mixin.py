@@ -19,6 +19,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
+import logging
 
 from contracts import contract, new_contract
 from lxml import html
@@ -42,6 +43,6 @@ class ScrapperMixin(object):
         try:
             return html.fromstring(response.text)
         except XMLSyntaxError as e:
-            print(e)
-            print(response.text)
+            logging.error(e)
+            logging.error(response.text)
             raise e
