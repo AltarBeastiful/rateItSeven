@@ -19,13 +19,33 @@
 #   You should have received a copy of the GNU General Public License
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
-from lxml import html
 
-from rateItSeven.senscritique.domain.product import Product
 from rateItSeven.senscritique.domain.sc_list import ListType, ScList, ListItem
+from rateItSeven.senscritique.product_service import product_from_url
 from rateItSeven.senscritique.sc_api import AuthentifiedService
 from rateItSeven.senscritique.scrapper_mixin import ScrapperMixin
-from rateItSeven.senscritique.product_service import product_from_url
+
+
+def _build_list_item(item_node, list_id):
+    """
+    Build a ListItem from the corresponding HTML item node
+    :param item_node: the HTML item node
+    :type: HtmlElement
+    :param list_id: the id of the list in which the item belong
+    :return: the ListItem
+    :rtype: ListItem
+    """
+    product_id = item_node.get('data-sc-product-id')
+    item_id = item_node.get('data-sc-item-id')
+
+    # Find item description if any
+    item_description = "".join(item_node.xpath('//div[@id="annotation-%s"]/text()' % item_id))
+
+    # Parse product info
+    product_a = item_node.xpath("//a[@id='product-title-%s']" % product_id)
+    product = product_from_url(product_a[0].attrib['href'], product_a[0].text) if product_a else None
+
+    return ListItem(id=item_id, description=item_description, list_id=list_id, product=product)
 
 
 class ListService(AuthentifiedService, ScrapperMixin):
@@ -110,31 +130,13 @@ class ListService(AuthentifiedService, ScrapperMixin):
         :param product_id: The product id to search for
         :rtype: ListItem
         """
-        page = 1
+        list_id = sclist.compute_list_id()
 
-        while True:
-            response = self.send_get(url=self._BASE_URL_SENSCRITIQUE + sclist.page_url(index=page))
-            html_content = self.parse_html(response)
-            item_container = html_content.xpath('//li[@data-sc-product-id="%s"]' % product_id)
+        for page in self._list_pages(sclist):
+            item_container = page.xpath('//li[@data-sc-product-id="%s"]' % product_id)
 
             if item_container:
-                # Find description
-                item_id = item_container[0].get("data-sc-item-id")
-                product_id = item_container[0].get("data-sc-product-id")
-                item_descriptions = item_container[0].xpath('//div[@id="annotation-%s"]/text()' % item_id)
-
-                # Parse product info
-                product_a = item_container[0].xpath('//a[@id = "product-title-%s"]' % product_id)
-                product = product_from_url(product_a[0].attrib['href'], product_a[0].text) if product_a else None
-                return ListItem(id=item_id, list_id=sclist.compute_list_id(),
-                                description="".join(item_descriptions), product=product)
-
-            else:
-                # Exit if there is no item on the current page
-                item_node_list = html_content.xpath('//li[@data-rel="list-item"]')
-                if not item_node_list:
-                    return None
-                page += 1
+                return _build_list_item(item_container[0], list_id)
 
     def find_list(self, title: str, list_type: ListType = ListType.MOVIE):
         """
@@ -159,31 +161,27 @@ class ListService(AuthentifiedService, ScrapperMixin):
         :type sc_list: ScList
         :rtype: list(ListItem)
         """
-        page = 1
+        list_id = sc_list.compute_list_id()
+
+        for page in self._list_pages(sc_list):
+            item_node_list = page.xpath('//li[@data-rel="list-item"]')
+            for item_node in item_node_list:
+                yield _build_list_item(item_node, list_id)
+
+    def _list_pages(self, sc_list):
+        i = 1
 
         while True:
-            response = self.send_get(url=self._BASE_URL_SENSCRITIQUE + sc_list.page_url(index=page))
-            html_content = html.fromstring(response.text)
+            response = self.send_get(url=self._BASE_URL_SENSCRITIQUE + sc_list.page_url(index=i))
+            html_content = self.parse_html(response)
+            page = html_content.xpath('//ul[@data-sc-content-ul="true" and @data-rel="sortable"]')
 
-            item_node_list = html_content.xpath('//li[@data-rel="list-item"]')
-
-            if not item_node_list:
+            if not page or not page[0].xpath('//li[@data-rel="list-item"]'):
                 raise StopIteration()
 
-            for item_node in item_node_list:
-                product_id = item_node.get('data-sc-product-id')
-                item_id = item_node.get('data-sc-item-id')
+            yield page[0]
 
-                # Find item description if any
-                item_description = "".join(item_node.xpath('//div[@id="annotation-%s"]/text()' % item_id))
-
-                # Parse product info
-                product_a = item_node.xpath("//a[@id='product-title-%s']" % product_id)
-                product = product_from_url(product_a[0].attrib['href'], product_a[0].text) if product_a else None
-
-                yield ListItem(id=item_id, description=item_description, list_id=sc_list.compute_list_id(), product=product)
-
-            page += 1
+            i += 1
 
     def _build_list_search_url(self, page=1, list_type: ListType = None):
         lsttype = "all" if list_type is None else list_type.value[1]
