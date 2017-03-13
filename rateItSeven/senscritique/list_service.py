@@ -83,7 +83,6 @@ class ListService(AuthentifiedService, ScrapperMixin):
         list_item_id = self.parse_html(response).xpath(self.XPATH_LIST_ITEM_ID_AFTER_ADD)
         return list_item_id[0] if list_item_id else None
 
-
     def add_episode(self, sclist: ScList, product_id: str, description: str):
         """
         Add an episode to a list
@@ -111,19 +110,31 @@ class ListService(AuthentifiedService, ScrapperMixin):
         :param product_id: The product id to search for
         :rtype: ListItem
         """
-        response = self.send_get(url=self._BASE_URL_SENSCRITIQUE + sclist.path)
+        page = 1
 
-        xpath_item_container = '//li[@data-sc-product-id="%s"]' % product_id
-        item_container = self.parse_html(response).xpath(xpath_item_container)
+        while True:
+            response = self.send_get(url=self._BASE_URL_SENSCRITIQUE + sclist.page_url(index=page))
+            html_content = self.parse_html(response)
+            item_container = html_content.xpath('//li[@data-sc-product-id="%s"]' % product_id)
 
-        if not item_container:
-            return None
+            if item_container:
+                # Find description
+                [item_id] = item_container[0].xpath("@data-sc-item-id")
+                item_descriptions = item_container[0].xpath('//div[@id="annotation-%s"]/text()' % item_id)
 
-        [item_id] = item_container[0].xpath("@data-sc-item-id")
-        item_descriptions = item_container[0].xpath('//div[@id="annotation-%s"]/text()' % item_id)
+                # Parse product info
+                [product_id] = item_container[0].xpath("@data-sc-product-id")
+                product_a = item_container[0].xpath('//a[@id = "product-title-%s"]' % product_id)
+                product = product_from_url(product_a[0].attrib['href'], product_a[0].text) if product_a else None
+                return ListItem(id=item_id, list_id=sclist.compute_list_id(),
+                                description="".join(item_descriptions), product=product)
 
-        return ListItem(id=item_id, list_id=sclist.compute_list_id(),
-                        description="".join(item_descriptions))
+            else:
+                # Exit if there is no item on the current page
+                item_node_list = html_content.xpath('//li[@data-rel="list-item"]')
+                if not item_node_list:
+                    return None
+                page += 1
 
     def find_list(self, title: str, list_type: ListType = ListType.MOVIE):
         """

@@ -129,3 +129,10 @@ class TestListService(RateItSevenTestCase):
 
         # We retrieved more than one page
         self.assertCountGreater(item_list, 30)
+
+    def test_find_list_item_on_second_page(self):
+        service = ListService(user=self.authentified_user())
+        sc_list = next(service.find_list(title='DONOTCHANGE_list_with_items', list_type=ListType.MOVIE))
+
+        list_item = service.find_list_item(sclist=sc_list, product_id='467126')
+        self.assertEqual(Product(id='467126', title='Dead Man', type=ProductType.MOVIE), list_item.product)
