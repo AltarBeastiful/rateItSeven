@@ -119,11 +119,11 @@ class ListService(AuthentifiedService, ScrapperMixin):
 
             if item_container:
                 # Find description
-                [item_id] = item_container[0].xpath("@data-sc-item-id")
+                item_id = item_container[0].get("data-sc-item-id")
+                product_id = item_container[0].get("data-sc-product-id")
                 item_descriptions = item_container[0].xpath('//div[@id="annotation-%s"]/text()' % item_id)
 
                 # Parse product info
-                [product_id] = item_container[0].xpath("@data-sc-product-id")
                 product_a = item_container[0].xpath('//a[@id = "product-title-%s"]' % product_id)
                 product = product_from_url(product_a[0].attrib['href'], product_a[0].text) if product_a else None
                 return ListItem(id=item_id, list_id=sclist.compute_list_id(),
