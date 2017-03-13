@@ -171,7 +171,8 @@ class ListService(AuthentifiedService, ScrapperMixin):
                 raise StopIteration()
 
             for item_node in item_node_list:
-                item_id = item_node.get('data-sc-product-id')
+                product_id = item_node.get('data-sc-product-id')
+                item_id = item_node.get('data-sc-item-id')
 
                 # Find item description if any
                 description = ""
@@ -181,7 +182,7 @@ class ListService(AuthentifiedService, ScrapperMixin):
                     description = description_node_list[0].text
 
                 # Parse product info
-                product_a = item_node.xpath("//a[@id='product-title-%s']" % item_id)
+                product_a = item_node.xpath("//a[@id='product-title-%s']" % product_id)
                 product = product_from_url(product_a[0].attrib['href'], product_a[0].text) if product_a else None
 
                 yield ListItem(id=item_id, description=description, list_id=sc_list.compute_list_id(), product=product)
