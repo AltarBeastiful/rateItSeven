@@ -40,15 +40,16 @@ from rateItSeven.senscritique.sc_api import AuthService, BadRequestException
 @synthesize_property('password', contract=str)
 @synthesize_property('search_paths', contract=list)
 @synthesize_property('store_file_path', contract=str)
+@synthesize_property('movie_list_name', contract=str, default='RateItSeven Films')
+@synthesize_property('serie_list_name', contract=str, default='RateItSeven Series')
 @synthesize_property('legacy_mode', contract=bool, default=False)
 @synthesize_constructor()
 class RateItSeven(object):
-    # TODO: Lists titles should be configurable by the user
-    _LISTS_LIB = {ListType.MOVIE: "La clef",
-                  ListType.SERIE: "zodes"}
 
     def __init__(self):
         self._lists = {}
+        self.lists_conf = {ListType.MOVIE: self._movie_list_name,
+                           ListType.SERIE: self._serie_list_name}
 
     def start(self):
         self.init()
@@ -65,7 +66,7 @@ class RateItSeven(object):
     def _start_legacy(self):
         sc = LegacySensCritique(self.login, self.password)
         sc.sign_in()
-        for video_type, title in self._LISTS_LIB.items():
+        for video_type, title in self.lists_conf.items():
             current_list = sc.retrieveListByTitle(title)
             if not current_list.isValid():
                 sc.createList(current_list)
@@ -74,7 +75,7 @@ class RateItSeven(object):
         with MovieStore(self._store_file_path, self._search_paths) as store:
             changes = store.pull_changes()
 
-            for video_type in RateItSeven._LISTS_LIB.keys():
+            for video_type in self.lists_conf.keys():
                 for guess in changes[video_type].added:
                     sc.addMovie(Movie(guess.get("title"), guess.abs_path), self._lists[video_type])
 
@@ -87,7 +88,7 @@ class RateItSeven(object):
         productsrv = ProductService()
 
         # Find and create if needed a list for each supported media
-        for video_type, title in self._LISTS_LIB.items():
+        for video_type, title in self.lists_conf.items():
             found_lists = list(listsrv.find_list(title=title, list_type=video_type))
             current_list = found_lists[0] if found_lists else listsrv.create_list(name=title, list_type=video_type)
             self._lists[video_type] = current_list
@@ -96,7 +97,7 @@ class RateItSeven(object):
         store = MovieStore(self._store_file_path, self._search_paths)
         changes = store.pull_changes()
 
-        for video_type in RateItSeven._LISTS_LIB.keys():
+        for video_type in self.lists_conf.keys():
             product_type = ProductType.MOVIE if video_type == ListType.MOVIE else ProductType.SERIE
             list_id = self._lists[video_type].compute_list_id()
 

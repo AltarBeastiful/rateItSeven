@@ -62,11 +62,13 @@ def main(args=None):
             # TODO Prompt for password
             pass
 
-        # TODO configure process with Serie and Movie list names (optional arguments)
         main_process = RateItSeven(login=options.get('username'),
                                    password=password,
                                    search_paths=options.get('paths'),
-                                   store_file_path=options.get('store_file'))
+                                   store_file_path=options.get('store_file'),
+                                   movie_list_name=options.get('movie_list'),
+                                   serie_list_name=options.get('serie_list')
+                                   )
         main_process.start()
 
     if help_required:
