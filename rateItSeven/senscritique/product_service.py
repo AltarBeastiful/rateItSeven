@@ -26,6 +26,11 @@ from rateItSeven.senscritique.domain.product import Product, ProductType
 from rateItSeven.senscritique.sc_api import ScRequester
 
 
+def product_from_url(url: str, title: str) -> Product:
+    m = re.search(".*/(.*)/.*/(.*)", url)
+    return Product(type=ProductType(m.group(1)), title=title, id=m.group(2))
+
+
 class ProductService(ScRequester):
     _URL_SEARCH = "https://www.senscritique.com/sc2/search/autocomplete.json"
 
@@ -36,12 +41,8 @@ class ProductService(ScRequester):
         if not content["json"]:
             return None
 
-        products = [self._product_from_url(product["url"], product["label"]) for product in content["json"]]
+        products = [product_from_url(product["url"], product["label"]) for product in content["json"]]
 
         if product_type is not None:
             products = [product for product in products if product.type == product_type]
         return products
-
-    def _product_from_url(self, url: str, title: str) -> Product:
-        m = re.search(".*senscritique\.com/(.*)/.*/(.*)", url)
-        return Product(type=ProductType(m.group(1)), title=title, id=m.group(2))
