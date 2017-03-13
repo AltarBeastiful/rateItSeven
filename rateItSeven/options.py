@@ -22,6 +22,7 @@
 """
 Options
 """
+import getpass
 import shlex
 from argparse import ArgumentParser
 
@@ -41,7 +42,7 @@ def build_argument_parser():
     opts.add_argument('-u', '--username', dest='username', default=None,
                              help='Your SensCritique user name')
 
-    opts.add_argument('-p', '--password', dest='password', default=None,
+    opts.add_argument('-p', '--password', dest='password', default=getpass.getpass(),
                              help='Your SensCritique password')
 
     opts.add_argument('-f', '--storefile', dest='store_file', default=APP_DATA_DIR + "/store",

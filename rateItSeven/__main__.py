@@ -25,8 +25,8 @@ Entry point module
 import logging
 import sys
 
-from rateItSeven.options import parse_options, argument_parser
 from rateItSeven.__version__ import __version__
+from rateItSeven.options import parse_options, argument_parser
 from rateItSeven.rateitseven import RateItSeven
 
 
@@ -57,13 +57,8 @@ def main(args=None):
     if options.get('username') and options.get('paths'):
         help_required = False
 
-        password = options.get('password')
-        if not password:
-            # TODO Prompt for password
-            pass
-
         main_process = RateItSeven(login=options.get('username'),
-                                   password=password,
+                                   password=options.get('password'),
                                    search_paths=options.get('paths'),
                                    store_file_path=options.get('store_file'),
                                    movie_list_name=options.get('movie_list'),
