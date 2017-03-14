@@ -198,11 +198,32 @@ class ListService(AuthentifiedService, ScrapperMixin):
         :rtype: bool
         :raise ProductNotFoundException: if the product_id can't be found in the sclist
         """
+        return self.update_episode(sclist=sclist,
+                                   product_id=product_id,
+                                   old_description=description,
+                                   new_description='')
+
+    def update_episode(self, sclist, product_id, old_description, new_description):
+        """
+        Remove an episode from a serie in the given list
+        :param sclist: the list that stores the serie
+        :type sclist: ScList
+        :param product_id: the product id of the serie
+        :type product_id: str
+        :param old_description: The old description of the episode
+        :type old_description: str
+        :param new_description: The new description of the episode
+        :type new_description: str
+        :return: True if the episode was correctly updated, False otherwise
+        :rtype: bool
+        :raise ProductNotFoundException: if the product_id can't be found in the sclist
+        """
         list_item = self.find_list_item(sclist=sclist, product_id=product_id)
 
         if list_item:
-            descr_result = list_item.description.replace(description, '')
-            descr_result = descr_result.replace('\n\n', '\n')
+            descr_result = list_item.description.replace(old_description, new_description)
+            if not new_description:
+                descr_result = descr_result.replace('\n\n', '\n')
 
             url = self._URL_EDIT_LIST_ITEM % list_item.id
             response = self.send_post(url=url, data={"description": descr_result})
@@ -233,7 +254,7 @@ class ListService(AuthentifiedService, ScrapperMixin):
         # Product not found
         return None
 
-    def find_list(self, title, list_type = ListType.MOVIE):
+    def find_list(self, title, list_type=ListType.MOVIE):
         """
         Look on SC for lists matching the given title in the given user lists
         :param title: the title of the list to find

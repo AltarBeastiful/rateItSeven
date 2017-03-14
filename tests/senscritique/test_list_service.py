@@ -129,6 +129,19 @@ class TestListService(RateItSevenTestCase):
                                         product_id="noSerieWithThisIdCanPossiblyExist",
                                         description="S01E01")
 
+    def test_update_episode(self):
+        self.service.add_episode(sclist=self.unique_list, product_id="444509", description="S05E01")
+        updated = self.service.update_episode(sclist=self.unique_list,
+                                    product_id="444509",
+                                    old_description="S05E01",
+                                    new_description="S05E02")
+
+        list_item = self.service.find_list_item(sclist=self.unique_list, product_id="444509")
+
+        self.assertTrue(updated)
+        self.assertNotIn("S05E01", list_item.description)
+        self.assertIn("S05E02", list_item.description)
+
     def test_should_find_all_list_items(self):
         sc_list = next(self.service.find_list(title="DONOTCHANGE_list_with_items", list_type=ListType.MOVIE))
 
