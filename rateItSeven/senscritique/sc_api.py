@@ -24,6 +24,7 @@ import json
 import re
 import requests
 from abc import ABC
+from contracts import contract, new_contract
 from lxml import html
 from synthetic import synthesize_constructor
 from synthetic import synthesize_property
@@ -68,6 +69,9 @@ class AuthentifiedService(ScRequester):
         return ScRequester.send_post(self, url, data=data, json_data=json_data, cookies=self.user.session_cookies, **kwargs)
 
 
+new_contract("User", User)
+
+
 class AuthService(ScRequester):
     _URL = "https://www.senscritique.com/sc2/auth/login.json"
     _URL_HOME = "https://www.senscritique.com/live"
@@ -88,6 +92,29 @@ class AuthService(ScRequester):
             raise UnauthorizedException
         username = self._find_username(cookies=response.cookies)
         return User(email=email, password=password, session_cookies=response.cookies, username=username)
+
+    @contract
+    def is_authenticated(self, user):
+        """
+        :type user: User
+        :rtype: bool
+        """
+
+        if user.session_cookies is None or len(user.session_cookies) == 0:
+            return False
+
+        service = AuthentifiedService(user=user)
+        response = service.send_get("https://www.senscritique.com/sc2/userActions/index.json")
+        if response.status_code == 401:
+            return False
+
+        if response.status_code != 200:
+            # @todo Fix laziness to setup proper logging
+            print("Authenticated check got unexpected error: {status_code}"
+                  .format(status_code=response.status_code))
+            return False
+
+        return True
 
     def _find_username(self, cookies):
         response = requests.get(url=self._URL_HOME, allow_redirects=False, cookies=cookies)

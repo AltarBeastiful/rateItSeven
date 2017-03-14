@@ -21,7 +21,10 @@
 #
 import datetime
 
+from requests.cookies import RequestsCookieJar
+
 from rateItSeven.senscritique.domain.sc_list import ListType
+from rateItSeven.senscritique.domain.user import User
 from rateItSeven.senscritique.list_service import ListService
 from rateItSeven.senscritique.sc_api import AuthService, UnauthorizedException
 from tests.lib.test_case import RateItSevenTestCase
@@ -39,3 +42,27 @@ class TestScApi(RateItSevenTestCase):
         with self.assertRaises(UnauthorizedException) as exc_catcher:
             response = AuthService().do_login(u"alogin", "badpassword")
 
+    def test_authenticated_can_do_authenticated_request(self):
+        user = self.authentified_user()
+
+        self.assertTrue(AuthService().is_authenticated(user=user))
+
+        list_generator = ListService(user=user).find_list("find_", ListType.MOVIE)
+        self.assertCountGreater(list_generator, 0)
+
+    def test_is_authenticated_false_if_session_cookies_none(self):
+        user = User(email="", password="", username="", session_cookies=None)
+
+        self.assertFalse(AuthService().is_authenticated(user=user))
+
+    def test_is_authenticated_false_if_session_cookies_empty(self):
+        user = User(email="", password="", username="", session_cookies=RequestsCookieJar())
+
+        self.assertFalse(AuthService().is_authenticated(user=user))
+
+    def test_is_authenticated_false_if_authenticated_request_fails(self):
+        cookie_jar = RequestsCookieJar()
+        cookie_jar.set('gross_cookie', 'yum', domain='senscritique.com')
+        user = User(email="", password="", username="", session_cookies=cookie_jar)
+
+        self.assertFalse(AuthService().is_authenticated(user=user))
