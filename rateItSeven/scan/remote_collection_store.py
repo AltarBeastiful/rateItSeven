@@ -25,26 +25,33 @@ from synthetic import synthesize_property
 
 from rateItSeven.scan.piece import Piece
 from rateItSeven.senscritique.domain.sc_list import ListType, ScList
+from rateItSeven.senscritique.domain.user import User
 from rateItSeven.senscritique.list_service import ListService
 from rateItSeven.senscritique.product_service import ProductService
 from rateItSeven.senscritique.sc_api import AuthService
 
 new_contract("Piece", Piece)
 new_contract("ScList", ScList)
+new_contract("User", User)
+
+
+class NotAuthenticatedError(Exception):
+    pass
 
 
 @synthesize_constructor()
-@synthesize_property('email', contract='string')
-@synthesize_property('password', contract='string')
-@synthesize_property('movie_collection_title', contract='string', default="MyMovieList")
+@synthesize_property('user', contract="User", read_only=True)
+@synthesize_property('movie_collection_title', contract='string', read_only=True, default="MyMovieList")
 class RemoteCollectionStore(object):
 
     def __init__(self):
-        self._user = AuthService().do_login(email=self.email, password=self.password)
-        self._list_service = ListService(user=self._user)
+        if not AuthService().is_authenticated(user=self.user):
+            raise NotAuthenticatedError()
 
+        self._list_service = ListService(user=self.user)
+
+        # Find or create SC list with specified title
         matching_list = next(self._list_service.find_list(self.movie_collection_title, list_type=ListType.MOVIE), None)
-
         if matching_list is None:
             self._movie_list = self._list_service.create_list(name=self.movie_collection_title,
                                                               list_type=ListType.MOVIE)
@@ -62,7 +69,7 @@ class RemoteCollectionStore(object):
         if not product_search_result:
             return False
 
-        item_id = ListService(self._user).add_movie(list_id=self._movie_list.compute_list_id(),
+        item_id = ListService(self.user).add_movie(list_id=self._movie_list.compute_list_id(),
                                                     product_id=product_search_result[0].id)
 
         return item_id is not None

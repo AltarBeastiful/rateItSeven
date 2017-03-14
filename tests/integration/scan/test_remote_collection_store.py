@@ -26,6 +26,7 @@ from guessit import guessit
 from rateItSeven.scan.piece import Piece
 from rateItSeven.scan.remote_collection_store import RemoteCollectionStore
 from rateItSeven.senscritique.list_service import ListService
+from rateItSeven.senscritique.sc_api import AuthService
 from tests.lib.test_case import RateItSevenTestCase
 
 
@@ -34,7 +35,9 @@ class TestRemoteCollectionStore(RateItSevenTestCase):
     def test_should_add_movies_to_sc_list(self):
         # GIVEN
         random_list_title = uuid.uuid4()
-        collection = RemoteCollectionStore(email="legalizme@gmail.com", password="12345", movie_collection_title=random_list_title.hex)
+
+        user = AuthService().do_login(email="legalizme@gmail.com", password="12345")
+        collection = RemoteCollectionStore(user=user, movie_collection_title=random_list_title.hex)
 
         path_1 = "/home/remi/Downloads/The Life Aquatic with Steve Zissou (2004) [1080p]/The.Life.Aquatic.with.Steve.Zissou.2004.1080p.BluRay.x264.YIFY.mp4"
         path_2 = "/home/remi/Downloads/files_to_scan/The Big Lebowski.mkv"
