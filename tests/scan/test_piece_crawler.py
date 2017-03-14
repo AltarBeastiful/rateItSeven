@@ -32,6 +32,9 @@ from rateItSeven.scan.local_collection_store import LocalCollectionStore
 from rateItSeven.scan.piece import Piece
 from rateItSeven.scan.piece_crawler import PieceCrawler
 from rateItSeven.scan.polling_observer_with_state import EmptyDirectorySnapshot, PollingObserverWithState
+from rateItSeven.scan.remote_collection_store import RemoteCollectionStore
+from rateItSeven.senscritique.domain.user import User
+from rateItSeven.senscritique.sc_api import AuthService
 from tests.lib.test_case import RateItSevenTestCase
 from tests.lib.watchdog_helper import TestWatchdogObserver
 
@@ -42,12 +45,16 @@ class TestPieceCrawler(RateItSevenTestCase):
     def setUp(self):
         self._clean_local_collection()
 
+    @patch.object(AuthService, 'is_authenticated', return_value=True)
     @patch.object(PollingObserverWithState, 'schedule')
     @patch.object(PollingObserverWithState, '__init__', return_value=None)
     @patch.object(PollingObserverWithState, 'state_list', return_value=[])
     @patch.object(EmptyDirectorySnapshot, '__init__', return_value=None)
-    def test_should_add_new_piece_to_local_collection(self, *mocks):
-        crawler = PieceCrawler(path="some/path")
+    @patch.object(RemoteCollectionStore, '__init__', return_value=None)
+    @patch.object(RemoteCollectionStore, 'add')
+    def test_should_add_new_piece_to_local_and_remote_collection(self, mock_add, *mocks):
+        user = User(email="meme@me.com", password="1234", username="meme")
+        crawler = PieceCrawler(path="some/path", user=user)
 
         piece_1_path = "/etc/movie/jumanji-1995.mkv"
         piece_2_path = "/etc/movie/Dikkenek (2006).avi"
@@ -59,6 +66,7 @@ class TestPieceCrawler(RateItSevenTestCase):
             Piece(path=piece_1_path, guess=guessit.guessit(piece_1_path)),
             Piece(path=piece_2_path, guess=guessit.guessit(piece_2_path)),
         ], crawler.local_collection().piece_list())
+        self.assertEqual(2, mock_add.call_count)
 
     def test_crawler_should_discover_file_in_path(self):
         crawler = PieceCrawler(path=self.FIXTURE_FILES_PATH)
@@ -135,6 +143,29 @@ class TestPieceCrawler(RateItSevenTestCase):
                 observer_helper.run_one_step()
 
             self.assertFalse(mock_on_created.called)
+
+    def test_no_remote_collection_if_no_user_provided(self):
+        crawler = PieceCrawler(self.FIXTURE_FILES_PATH)
+
+        self.assertIsNone(crawler.remote_collection)
+
+    @patch.object(AuthService, 'is_authenticated', return_value=False)
+    def test_no_remote_collection_if_user_not_authentified(self, *mocks):
+        user = User(email="meme@me.com", password="1234", username="meme")
+        crawler = PieceCrawler(self.FIXTURE_FILES_PATH, user=user)
+
+        self.assertIsNone(crawler.remote_collection)
+
+    @patch.object(AuthService, 'is_authenticated', return_value=False)
+    @patch.object(RemoteCollectionStore, '__init__', return_value=None)
+    def test_should_open_remote_collection_with_specified_title(self, mock_remote_collection, *mocks):
+        user = User(email="meme@me.com", password="1234", username="meme")
+
+        # WHEN
+        PieceCrawler(self.FIXTURE_FILES_PATH, user=user, remote_collection_title="some list")
+
+        # THEN
+        mock_remote_collection.assert_called_once_with(user=user, movie_collection_title="some list")
 
     def _is_local_collection_empty(self):
         local_collection = LocalCollectionStore(self.LOCAL_COLLECTION_PATH)
