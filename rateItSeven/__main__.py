@@ -22,6 +22,7 @@
 """
 Entry point module
 """
+import getpass
 import logging
 import sys
 
@@ -57,8 +58,12 @@ def main(args=None):
     if options.get('username') and options.get('paths'):
         help_required = False
 
+        password = options.get('password')
+        if not password:
+            password = getpass.getpass()
+
         main_process = RateItSeven(login=options.get('username'),
-                                   password=options.get('password'),
+                                   password=password,
                                    search_paths=options.get('paths'),
                                    store_file_path=options.get('store_file'),
                                    movie_list_name=options.get('movie_list'),
