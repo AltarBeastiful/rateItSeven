@@ -33,7 +33,7 @@ class TestListService(RateItSevenTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.service = ListService(user=RateItSevenTestCase.authentified_user())
-        cls.unique_list = cls.service.create_list(str(datetime.datetime.now()), ListType.MOVIE)
+        cls.unique_list = cls.service.create_list("sharedList_"+str(datetime.datetime.now()), ListType.MOVIE)
 
     @classmethod
     def tearDownClass(cls):
@@ -87,12 +87,12 @@ class TestListService(RateItSevenTestCase):
         self.assertTrue(removed)
 
     def test_update_movie(self):
-        item_id = self.service.add_movie(self.unique_list.compute_list_id(), "11267022", "Some/path")
+        item_id = self.service.add_movie(self.unique_list.compute_list_id(), "374212", "Some/path")
         updated = self.service.update_movie(item_id, "Some/other/path")
 
         self.assertTrue(updated)
 
-        list_item = self.service.find_list_item(self.unique_list, "11267022")
+        list_item = self.service.find_list_item(self.unique_list, "374212")
         self.assertEqual("Some/other/path", list_item.description)
 
     def test_add_episode_serie_not_yet_added(self):
