@@ -160,7 +160,8 @@ class ListService(AuthentifiedService, ScrapperMixin):
         """
         Add an episode to a list
         The serie will be added to the list if not done yet
-        The given description will just be appended to the existing description otherwise
+        The given description will just be inserted in the existing description otherwise
+        Episodes descriptions are sorted alphabetically in the serie
         :param sclist: The list where to add the episode
         :type sclist: ScList
         :param product_id: the product id of the serie in which add the episode
@@ -172,8 +173,13 @@ class ListService(AuthentifiedService, ScrapperMixin):
         list_item = self.find_list_item(sclist=sclist, product_id=product_id)
 
         if list_item:
+            # Insert given descr on the right position by sorting lines alphabetically
+            descr_list = list_item.description.split('\n')
+            descr_list.append(description)
+            descr_list.sort()
+
             url = self._URL_EDIT_LIST_ITEM % list_item.id
-            self.send_post(url=url, data={"description": list_item.description + "\n" + description})
+            self.send_post(url=url, data={"description": '\n'.join(descr_list)})
             return list_item.id
 
         else:

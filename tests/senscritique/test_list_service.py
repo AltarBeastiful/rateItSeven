@@ -100,12 +100,11 @@ class TestListService(RateItSevenTestCase):
         self.assertIsNotNone(response)
 
     def test_add_episode_serie_already_added(self):
-        self.service.add_episode(sclist=self.unique_list, product_id="444509", description="S04E01")
-        self.service.add_episode(sclist=self.unique_list, product_id="444509", description="S04E02")
+        self.service.add_episode(sclist=self.unique_list, product_id="444509", description="S01E02")
+        self.service.add_episode(sclist=self.unique_list, product_id="444509", description="S01E01")
 
         list_item = self.service.find_list_item(sclist=self.unique_list, product_id="444509")
-        self.assertIn("S04E01",list_item.description)
-        self.assertIn("S04E02",list_item.description)
+        self.assertIn("S01E01\nS01E02",list_item.description)
 
     def test_should_find_all_list_items(self):
         sc_list = next(self.service.find_list(title="DONOTCHANGE_list_with_items", list_type=ListType.MOVIE))
