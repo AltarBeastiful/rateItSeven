@@ -21,6 +21,8 @@
 #
 import json
 
+from lxml.html import HtmlElement
+
 from rateItSeven.senscritique.domain.sc_list import ListType, ScList, ListItem
 from rateItSeven.senscritique.product_service import product_from_url
 from rateItSeven.senscritique.sc_api import AuthentifiedService
@@ -31,8 +33,9 @@ def _build_list_item(item_node, list_id):
     """
     Build a ListItem from the corresponding HTML item node
     :param item_node: the HTML item node
-    :type: HtmlElement
+    :type item_node: HtmlElement
     :param list_id: the id of the list in which the item belong
+    :type list_id: str
     :return: the ListItem
     :rtype: ListItem
     """
@@ -50,6 +53,9 @@ def _build_list_item(item_node, list_id):
 
 
 class ListService(AuthentifiedService, ScrapperMixin):
+    """
+    A stateless service providing all list related operations on www.senscritique.com
+    """
     _URL_ADD_LIST = "https://www.senscritique.com/lists/add.ajax"
     _URL_ADD_LIST_ITEM = "https://www.senscritique.com/items/add.ajax"
     _URL_REMOVE_LIST_ITEM = "https://www.senscritique.com/items/remove.json"
@@ -58,11 +64,13 @@ class ListService(AuthentifiedService, ScrapperMixin):
     _SUB_TYPE_ID = "22"
     XPATH_LIST_ITEM_ID_AFTER_ADD = '//li[@data-rel="sc-item-delete"]/@data-sc-item-id'
 
-    def create_list(self, name: str, list_type: ListType):
+    def create_list(self, name, list_type):
         """
         Create an SC list
         :param name: The name of the list to create
+        :type name: str
         :param list_type: The type of list to create, eg Movie, Serie
+        :type list_type: ListType
         :return: the SC path to access the list, created by SC using the name and a random id
         :rtype: ScList
         """
@@ -75,25 +83,30 @@ class ListService(AuthentifiedService, ScrapperMixin):
         response = self.send_post(self._URL_ADD_LIST, data=data)
         return ScList(type=list_type, name=name, path=response.headers["Location"])
 
-    def delete_list(self, list):
+    def delete_list(self, list_to_delete):
         """
         Delete a list
-        :param ScList list:
+        :param list_to_delete: the list to delete
+        :type list_to_delete: ScList
+        :return: True if list was successfully deleted, False otherwise
         :rtype: bool
         """
-
-        delete_url = "https://www.senscritique.com/sc2/lists/delete/%s.json" % (list.compute_list_id())
-
+        delete_url = "https://www.senscritique.com/sc2/lists/delete/%s.json" % (list_to_delete.compute_list_id())
         response = self.send_post(delete_url, data={'confirm': True})
+
         return response.status_code == 200
 
-    def add_movie(self, list_id: str, product_id: str, description=""):
+    def add_movie(self, list_id, product_id, description=""):
         """
         Add an item to a SC list
         :param list_id: the list id where to put the given movie/serie
+        :type list_id: str
         :param product_id: the SC id of the movie/serie to add
+        :type product_id: str
         :param description: A description for that item in the list
+        :type description: str
         :return: the SC list item id used to identify the new item in the list
+        :rtype: str
         """
         data = {
             "list_id": list_id,
@@ -101,27 +114,40 @@ class ListService(AuthentifiedService, ScrapperMixin):
             "product_id": product_id,
             "description": description
         }
+
         response = self.send_post(self._URL_ADD_LIST_ITEM, data=data)
         list_item_id = self.parse_html(response).xpath(self.XPATH_LIST_ITEM_ID_AFTER_ADD)
+
         return list_item_id[0] if list_item_id else None
 
     def remove_movie(self, list_id, item_id):
+        """
+        Remove an item from a SC list
+        :param list_id: the list id from which to remove the movie/serie
+        :type list_id: str
+        :param item_id: the list item id of the item to remove
+        :type item_id: str
+        :return: True if delete operation succeeded, False otherwise
+        :rtype: bool
+        """
         data = {
             "listId": list_id,
             "itemId": item_id,
             "subtypeId": self._SUB_TYPE_ID
         }
+
         response = self.send_post(self._URL_REMOVE_LIST_ITEM, data=data)
         json_response = json.loads(response.text)
+
         return json_response["json"]["success"]
 
     def update_movie(self, item_id, description):
         """
         Change the description of the given list item
         :param item_id: the id of the item to update
-        :type: str
+        :type item_id: str
         :param description: the description to set
-        :type: str
+        :type description: str
         :return: True if operation suceeded, False otherwise
         :rtype: bool
         """
@@ -130,14 +156,17 @@ class ListService(AuthentifiedService, ScrapperMixin):
         json_response = json.loads(response.text)
         return json_response["json"]["success"]
 
-    def add_episode(self, sclist: ScList, product_id: str, description: str):
+    def add_episode(self, sclist, product_id, description):
         """
         Add an episode to a list
         The serie will be added to the list if not done yet
         The given description will just be appended to the existing description otherwise
         :param sclist: The list where to add the episode
+        :type sclist: ScList
         :param product_id: the product id of the serie in which add the episode
+        :type product_id: str
         :param description: The description of the episode
+        :type description: str
         :return: the list item id of the serie inside this list
         """
         list_item = self.find_list_item(sclist=sclist, product_id=product_id)
@@ -154,7 +183,10 @@ class ListService(AuthentifiedService, ScrapperMixin):
         """
         Find a product in a list
         :param sclist: The list to search in
+        :type sclist: ScList
         :param product_id: The product id to search for
+        :type product_id: str
+        :return: The list item matching the given product id in the given list or None if not found
         :rtype: ListItem
         """
         list_id = sclist.compute_list_id()
@@ -165,11 +197,16 @@ class ListService(AuthentifiedService, ScrapperMixin):
             if item_container:
                 return _build_list_item(item_container[0], list_id)
 
-    def find_list(self, title: str, list_type: ListType = ListType.MOVIE):
+        # Product not found
+        return None
+
+    def find_list(self, title, list_type = ListType.MOVIE):
         """
         Look on SC for lists matching the given title in the given user lists
         :param title: the title of the list to find
+        :type title: str
         :param list_type: the type of list to find (Serie/Movie)
+        :type list_type: ListType
         :return: a list of ScList matching the title
         :rtype: generator(ScList)
         """
@@ -185,8 +222,9 @@ class ListService(AuthentifiedService, ScrapperMixin):
     def list_item_list(self, sc_list):
         """
         Returns all items of the ScList
+        :param sc_list: the ScList
         :type sc_list: ScList
-        :rtype: list(ListItem)
+        :rtype: generator(ListItem)
         """
         list_id = sc_list.compute_list_id()
 

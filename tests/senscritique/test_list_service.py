@@ -67,14 +67,14 @@ class TestListService(RateItSevenTestCase):
         unique_name = "Tobedeleted%s" % (str(datetime.datetime.now()))
         sc_list = self.service.create_list(unique_name, ListType.MOVIE)
 
-        delete_response = self.service.delete_list(list=sc_list)
+        delete_response = self.service.delete_list(list_to_delete=sc_list)
 
         self.assertTrue(delete_response)
         self.assertEqual([], list(self.service.find_list(title=unique_name, list_type=ListType.MOVIE)))
 
     def test_delete_unknown_list_returns_true(self):
         sc_list = ScList(type=ListType.MOVIE, name="unknown", path="list/unknown/12345")
-        self.assertTrue(self.service.delete_list(list=sc_list))
+        self.assertTrue(self.service.delete_list(list_to_delete=sc_list))
 
     def test_add_movie(self):
         response = self.service.add_movie(self.unique_list.compute_list_id(), "11267022", "Un film porno ?")
