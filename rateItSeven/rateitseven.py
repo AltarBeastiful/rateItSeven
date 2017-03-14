@@ -45,7 +45,6 @@ from rateItSeven.senscritique.sc_api import AuthService, BadRequestException
 @synthesize_property('legacy_mode', contract=bool, default=False)
 @synthesize_constructor()
 class RateItSeven(object):
-
     def __init__(self):
         self._lists = {}
         self.lists_conf = {ListType.MOVIE: self._movie_list_name,
@@ -113,16 +112,15 @@ class RateItSeven(object):
                         if video_type == ListType.MOVIE:
                             listsrv.add_movie(list_id=list_id, product_id=product.id, description=guess.abs_path)
                         else:
-                            # TODO create a real template to display episode list
-                            description = "%s : (Season %d, Episode %d)" % (guess.get("episode_title"),
-                                                                            guess.get("season"),
-                                                                            guess.get("episode"))
+                            description = "S%02d, E%02d : %s" % (guess.get("season"),
+                                                                 guess.get("episode"),
+                                                                 guess.abs_path)
                             listsrv.add_episode(self._lists[video_type],
                                                 product_id=product.id,
                                                 description=description)
 
                         logging.info("Product '%s' added to list '%s'"
-                                     % (product.title , self._lists[video_type].name))
+                                     % (product.title, self._lists[video_type].name))
 
                     except BadRequestException:
                         logging.error("error adding '%s' to list. Already in it ?" % product.title)
