@@ -115,6 +115,21 @@ class ListService(AuthentifiedService, ScrapperMixin):
         json_response = json.loads(response.text)
         return json_response["json"]["success"]
 
+    def update_movie(self, item_id, description):
+        """
+        Change the description of the given list item
+        :param item_id: the id of the item to update
+        :type: str
+        :param description: the description to set
+        :type: str
+        :return: True if operation suceeded, False otherwise
+        :rtype: bool
+        """
+        url = self._URL_EDIT_LIST_ITEM % item_id
+        response = self.send_post(url=url, data={"description": description})
+        json_response = json.loads(response.text)
+        return json_response["json"]["success"]
+
     def add_episode(self, sclist: ScList, product_id: str, description: str):
         """
         Add an episode to a list

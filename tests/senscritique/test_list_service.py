@@ -86,6 +86,15 @@ class TestListService(RateItSevenTestCase):
         removed = self.service.remove_movie(sc_list.compute_list_id(), item_id)
         self.assertTrue(removed)
 
+    def test_update_movie(self):
+        item_id = self.service.add_movie(self.unique_list.compute_list_id(), "11267022", "Some/path")
+        updated = self.service.update_movie(item_id, "Some/other/path")
+
+        self.assertTrue(updated)
+
+        list_item = self.service.find_list_item(self.unique_list, "11267022")
+        self.assertEqual("Some/other/path", list_item.description)
+
     def test_add_episode_serie_not_yet_added(self):
         response = self.service.add_episode(sclist=self.unique_list, product_id="444509", description="S04E01")
         self.assertIsNotNone(response)
