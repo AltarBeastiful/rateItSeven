@@ -19,6 +19,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with RateItSeven. If not, see <http://www.gnu.org/licenses/>.
 #
+import json
 
 from rateItSeven.senscritique.domain.sc_list import ListType, ScList, ListItem
 from rateItSeven.senscritique.product_service import product_from_url
@@ -51,6 +52,7 @@ def _build_list_item(item_node, list_id):
 class ListService(AuthentifiedService, ScrapperMixin):
     _URL_ADD_LIST = "https://www.senscritique.com/lists/add.ajax"
     _URL_ADD_LIST_ITEM = "https://www.senscritique.com/items/add.ajax"
+    _URL_REMOVE_LIST_ITEM = "https://www.senscritique.com/items/remove.json"
     _URL_SEARCH_LIST = "https://www.senscritique.com/sc2/%s/listes/all/%s/titre/page-%d.ajax"
     _URL_EDIT_LIST_ITEM = "https://www.senscritique.com/items/edit/%s.json"
     _SUB_TYPE_ID = "22"
@@ -102,6 +104,16 @@ class ListService(AuthentifiedService, ScrapperMixin):
         response = self.send_post(self._URL_ADD_LIST_ITEM, data=data)
         list_item_id = self.parse_html(response).xpath(self.XPATH_LIST_ITEM_ID_AFTER_ADD)
         return list_item_id[0] if list_item_id else None
+
+    def remove_movie(self, list_id, item_id):
+        data = {
+            "listId": list_id,
+            "itemId": item_id,
+            "subtypeId": self._SUB_TYPE_ID
+        }
+        response = self.send_post(self._URL_REMOVE_LIST_ITEM, data=data)
+        json_response = json.loads(response.text)
+        return json_response["json"]["success"]
 
     def add_episode(self, sclist: ScList, product_id: str, description: str):
         """

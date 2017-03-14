@@ -99,6 +99,13 @@ class TestListService(RateItSevenTestCase):
 
         self.assertIsNotNone(response)
 
+    def test_remove_movie(self):
+        service = ListService(user=self.authentified_user())
+        sc_list = service.create_list("myList_"+str(datetime.datetime.now()), ListType.MOVIE)
+        item_id = service.add_movie(sc_list.compute_list_id(), "11267022")
+        removed = service.remove_movie(sc_list.compute_list_id(), item_id)
+        self.assertTrue(removed)
+
     def test_add_episode_serie_not_yet_added(self):
         service = ListService(user=self.authentified_user())
         sc_list = service.create_list("myList_"+str(datetime.datetime.now()), ListType.MOVIE)
