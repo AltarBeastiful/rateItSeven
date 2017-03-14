@@ -185,7 +185,34 @@ class ListService(AuthentifiedService, ScrapperMixin):
         else:
             return self.add_movie(sclist.compute_list_id(), product_id, description)
 
-    def find_list_item(self, sclist: ScList, product_id: str):
+    def remove_episode(self, sclist, product_id, description):
+        """
+        Remove an episode from a serie in the given list
+        :param sclist: the list that stores the serie
+        :type sclist: ScList
+        :param product_id: the product id of the serie
+        :type product_id: str
+        :param description: The description of the episode
+        :type description: str
+        :return: True if the episode was correctly removed, False otherwise
+        :rtype: bool
+        :raise ProductNotFoundException: if the product_id can't be found in the sclist
+        """
+        list_item = self.find_list_item(sclist=sclist, product_id=product_id)
+
+        if list_item:
+            descr_result = list_item.description.replace(description, '')
+            descr_result = descr_result.replace('\n\n', '\n')
+
+            url = self._URL_EDIT_LIST_ITEM % list_item.id
+            response = self.send_post(url=url, data={"description": descr_result})
+
+            json_response = json.loads(response.text)
+            return json_response["json"]["success"]
+
+        raise ProductNotFoundException()
+
+    def find_list_item(self, sclist, product_id):
         """
         Find a product in a list
         :param sclist: The list to search in
@@ -257,3 +284,7 @@ class ListService(AuthentifiedService, ScrapperMixin):
     def _build_list_search_url(self, page=1, list_type: ListType = None):
         lsttype = "all" if list_type is None else list_type.value[1]
         return str(self._URL_SEARCH_LIST % (self.user.username, lsttype, page))
+
+
+class ProductNotFoundException(Exception):
+    pass

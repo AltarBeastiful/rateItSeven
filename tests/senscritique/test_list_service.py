@@ -23,7 +23,7 @@ import datetime
 
 from rateItSeven.senscritique.domain.product import ProductType, Product
 from rateItSeven.senscritique.domain.sc_list import ListType, ScList
-from rateItSeven.senscritique.list_service import ListService
+from rateItSeven.senscritique.list_service import ListService, ProductNotFoundException
 from tests.lib.test_case import RateItSevenTestCase
 
 
@@ -104,7 +104,30 @@ class TestListService(RateItSevenTestCase):
         self.service.add_episode(sclist=self.unique_list, product_id="444509", description="S01E01")
 
         list_item = self.service.find_list_item(sclist=self.unique_list, product_id="444509")
-        self.assertIn("S01E01\nS01E02",list_item.description)
+        self.assertIn("S01E01\nS01E02", list_item.description)
+
+    def test_remove_episode_that_exists(self):
+        self.service.add_episode(sclist=self.unique_list, product_id="444509", description="S03E02")
+        self.service.add_episode(sclist=self.unique_list, product_id="444509", description="S03E03")
+
+        removed = self.service.remove_episode(sclist=self.unique_list, product_id="444509", description="S03E02")
+
+        list_item = self.service.find_list_item(sclist=self.unique_list, product_id="444509")
+        self.assertTrue(removed)
+        self.assertNotIn("S03E02", list_item.description)
+        self.assertIn("S03E03", list_item.description)
+
+    def test_remove_episode_that_doesnt_exist(self):
+        self.service.add_episode(sclist=self.unique_list, product_id="444509", description="S04E01")
+
+        removed = self.service.remove_episode(sclist=self.unique_list, product_id="444509", description="S04E02")
+        self.assertTrue(removed)
+
+    def test_remove_episode_serie_doesnt_exist(self):
+        with self.assertRaises(ProductNotFoundException):
+            self.service.remove_episode(sclist=self.unique_list,
+                                        product_id="noSerieWithThisIdCanPossiblyExist",
+                                        description="S01E01")
 
     def test_should_find_all_list_items(self):
         sc_list = next(self.service.find_list(title="DONOTCHANGE_list_with_items", list_type=ListType.MOVIE))
