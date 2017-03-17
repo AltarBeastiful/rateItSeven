@@ -34,5 +34,6 @@ setup(name=APP_NAME,
       license='GPL version 3',
       author='Rémi Benoit, Paolo de Vathaire',
       url='https://github.com/AltarBeastiful/rateItSeven',
-      keywords=['SensCritique', 'Sens Critique', 'library', 'media' , 'movie', 'serie', 'film']
+      keywords=['SensCritique', 'Sens Critique', 'library', 'media' , 'movie', 'serie', 'film'],
+      test_suite='tests'
       )
