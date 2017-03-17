@@ -3,7 +3,10 @@ python:
   - "3.5"
 # command to install dependencies
 install:
-    - pip install -r requirements.txt
-    - pip install coveralls
+  - pip install -r requirements.txt
+  - pip install coveralls
 # command to run tests
-script: coverage3 run --source=rateItSeven --omit="rateItSeven/legacy/*" setup.py test
+script:
+  - coverage3 run --source=rateItSeven --omit="rateItSeven/legacy/*" setup.py test
+after_success:
+  - coveralls
